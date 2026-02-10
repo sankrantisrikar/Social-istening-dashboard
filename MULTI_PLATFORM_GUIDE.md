@@ -2,11 +2,10 @@
 
 ## Overview
 
-Your PainMed-PA dashboard now supports **three powerful data sources**:
+Your PainMed-PA dashboard now supports **two powerful data sources**:
 
-1. **🔗 LinkedIn** - Professional network discussions and insights
-2. **🐦 Twitter/X** - Social media mentions and discussions
-3. **🤖 Reddit** - Community discussions from relevant subreddits
+1. **💼 LinkedIn** - Professional network discussions and insights
+2. **🤖 Reddit** - Community discussions from relevant subreddits
 
 ---
 
@@ -15,7 +14,7 @@ Your PainMed-PA dashboard now supports **three powerful data sources**:
 **New Feature**: Test the dashboard without any API calls or credentials!
 
 Click the **"🎭 Try Demo Mode"** button to:
-- Load 50 sample posts across all 3 platforms
+- Load 50 sample posts across both platforms
 - See how the dashboard works with real-looking data
 - Test all features (filters, charts, bookmarks, AI insights)
 - No Apify token or LinkedIn cookie needed!
@@ -44,7 +43,6 @@ Only needed if you want LinkedIn data. See `CREDENTIALS_GUIDE.md` for detailed i
 
 Check the platforms you want to search:
 - **LinkedIn**: Professional network (requires li_at cookie)
-- **Twitter/X**: Social media posts (no auth needed)
 - **Reddit**: Community discussions (no auth needed)
 
 ### 4. Enter Keywords
@@ -102,40 +100,9 @@ The dashboard will collect data from all selected platforms and display unified 
 
 ---
 
-### 🐦 Twitter/X (Social Media)
-
-**What it does**: Searches public tweets matching your keywords
-
-**Use cases**:
-- Monitor brand mentions
-- Track industry discussions
-- Identify trending topics
-- Find potential leads
-
-**Optional filters**:
-- **Verified users only**: Only show tweets from verified accounts
-- **Exclude retweets**: Remove retweets from results
-- **Minimum likes**: Only show tweets with X or more likes
-
-**Search tips**:
-- Use specific phrases: `"prior authorization"`
-- Combine keywords: `pain management billing`
-- Track hashtags: `#priorauth`
-- Monitor competitors: Include competitor names
-
-**Data returned**:
-- Tweet text and author
-- Engagement (likes, retweets, replies)
-- Tweet URL and timestamp
-- Author profile link
-
-**Cost**: ~$0.02-0.05 per 100 tweets
-
----
-
 ### 🤖 Reddit (Community Discussions)
 
-**What it does**: Searches Reddit posts and discussions
+**What it does**: Searches Reddit posts and discussions using Reddit's free public JSON API
 
 **Use cases**:
 - Monitor community sentiment
@@ -171,7 +138,7 @@ AskDocs
 - Upvotes and comment count
 - Post URL and timestamp
 
-**Cost**: ~$0.01-0.03 per 100 posts
+**Cost**: FREE (uses Reddit's public JSON API)
 
 ---
 
@@ -179,39 +146,35 @@ AskDocs
 
 ### Per Search (50 items per platform):
 - **LinkedIn only**: ~$1.00
-- **Twitter only**: ~$0.03
-- **Reddit only**: ~$0.02
-- **All three platforms**: ~$1.05
+- **Reddit only**: FREE
+- **Both platforms**: ~$1.00
 
 ### Monthly Estimates (4 searches/week, 50 items each):
 - **LinkedIn only**: ~$16/month
-- **Twitter only**: ~$0.50/month
-- **Reddit only**: ~$0.30/month
-- **All three platforms**: ~$17/month
-- **Without LinkedIn (Twitter+Reddit)**: ~$0.80/month
+- **Reddit only**: FREE
+- **Both platforms**: ~$16/month
 
 ### Large Scale (500 items per platform):
-- **All three platforms**: ~$10.50 per search
-- **Without LinkedIn**: ~$0.50 per search
-- **Weekly searches (all platforms)**: ~$42/month
-- **Daily searches (all platforms)**: ~$315/month
+- **Both platforms**: ~$10.00 per search (LinkedIn only)
+- **Weekly searches**: ~$40/month
+- **Daily searches**: ~$300/month
 
-**💡 Tip**: Start with 30-50 items per platform to test, then scale up as needed. Use Demo Mode to test the dashboard for free!
+**💡 Tip**: Start with 30-50 items per platform to test, then scale up as needed. Use Demo Mode to test the dashboard for free! Reddit is completely free with no API costs.
 
 ---
 
 ## Platform Combinations
 
 ### Best for Lead Generation:
-- ✅ LinkedIn + Twitter + Reddit (find professionals discussing problems)
+- ✅ LinkedIn + Reddit (find professionals discussing problems)
 - ✅ LinkedIn only (B2B decision-makers)
 
 ### Best for Market Research:
-- ✅ All three platforms (comprehensive view)
-- ✅ Twitter + Reddit (public sentiment)
+- ✅ Both platforms (comprehensive view)
+- ✅ Reddit only (public sentiment, completely free)
 
 ### Most Cost-Effective:
-- ✅ Twitter + Reddit (~$0.05 per search)
+- ✅ Reddit only (FREE!)
 - ✅ Demo Mode (free!)
 
 ---
@@ -237,8 +200,7 @@ All platforms feed into the same analytics:
 ### Platform Badges
 
 Each post shows its source platform with a colored badge:
-- 🔗 **LinkedIn** (Blue) - Professional network
-- 🐦 **Twitter** (Light Blue) - Social media
+- 💼 **LinkedIn** (Blue) - Professional network
 - 🤖 **Reddit** (Orange) - Community discussions
 
 ### Bookmarks & Collections
@@ -274,12 +236,12 @@ billing
 ### Platform Combinations
 
 **For lead generation**:
-- ✅ LinkedIn + Twitter + Reddit (find people discussing problems)
+- ✅ LinkedIn + Reddit (find people discussing problems)
 - ✅ LinkedIn only (B2B decision-makers)
 
 **For market research**:
-- ✅ All three platforms (comprehensive view)
-- ✅ Twitter + Reddit (public sentiment)
+- ✅ Both platforms (comprehensive view)
+- ✅ Reddit only (public sentiment, free)
 
 ### Performance Tips
 
@@ -332,15 +294,6 @@ billing
 
 ## Advanced Features
 
-### Twitter Advanced Queries
-
-Use Twitter's search operators:
-```
-"prior authorization" pain management -filter:retweets min_faves:10
-```
-
-This finds tweets about prior auth in pain management with at least 10 likes, excluding retweets.
-
 ### Reddit Subreddit Targeting
 
 Focus on specific communities:
@@ -360,7 +313,7 @@ Result: Top posts about PA denials in medical subreddits this week
 ### CSV Export
 
 Export all data with platform information:
-- Platform column shows source (LinkedIn/Twitter/Reddit)
+- Platform column shows source (LinkedIn/Reddit)
 - All engagement metrics included
 - Timestamps and URLs preserved
 
@@ -378,16 +331,14 @@ Export saved posts across platforms:
 ### Data Sources
 
 - **LinkedIn**: Professional network (requires authentication)
-- **Twitter**: Public tweets only (no private accounts)
-- **Reddit**: Public posts only (no private subreddits)
+- **Reddit**: Public posts only (no authentication required, uses free public API)
 
 ### Authentication
 
 - **LinkedIn**: Requires li_at cookie (see CREDENTIALS_GUIDE.md)
-- **Twitter**: No authentication required
-- **Reddit**: No authentication required
+- **Reddit**: No authentication required (uses free public JSON API)
 
-Just your Apify API token!
+Just your Apify API token for LinkedIn!
 
 ### Data Retention
 
@@ -412,6 +363,14 @@ Have ideas for improvements? Let us know!
 ---
 
 ## Changelog
+
+### v3.3 - Focused on 2 Platforms
+- ✅ Removed Twitter/X integration (focusing on LinkedIn + Reddit)
+- ✅ LinkedIn (working properly with Apify)
+- ✅ Reddit (FREE - uses public JSON API, no authentication)
+- ✅ Demo Mode with 50 sample posts across 2 platforms
+- ✅ Streamlined platform selection
+- ✅ Reduced costs (Reddit is now free!)
 
 ### v3.2 - Focused on 3 Platforms
 - ✅ Removed NPI/NPPES integration (focusing on social platforms)

@@ -1,79 +1,40 @@
-# Twitter/X and Reddit Testing Guide
+# Reddit Testing Guide
 
 ## Authentication Requirements ✅
 
-**Good news!** Both Twitter and Reddit actors work without any special authentication:
+**Good news!** Reddit now uses a completely free public JSON API:
 
-- ✅ **Twitter/X**: No cookies, no API keys needed - just your Apify token
-- ✅ **Reddit**: No cookies, no API keys needed - just your Apify token
-- ✅ **LinkedIn**: Already working (requires li_at cookie)
+- ✅ **Reddit**: FREE - No authentication, no Apify token needed!
+- ✅ **LinkedIn**: Working (requires li_at cookie + Apify token)
 
 ---
 
 ## Current Configuration
 
-### Twitter Actor
-- **Actor ID**: `apidojo/twitter-scraper-lite`
-- **Name**: Twitter Scraper Unlimited
-- **Authentication**: None required (uses Apify token only)
+### Reddit Data Source
+- **API**: Reddit's public JSON API (`https://www.reddit.com/search.json`)
+- **Authentication**: None required
+- **Cost**: FREE
 - **Features**:
-  - Advanced search queries
-  - Event-based pricing
-  - No rate limits
-  - Supports filters (verified users, exclude retweets, min likes)
-
-### Reddit Actor
-- **Actor ID**: `harshmaur/reddit-scraper-pro`
-- **Name**: Reddit Scraper Pro
-- **Authentication**: None required (uses Apify token only)
-- **Features**:
-  - Fast Mode enabled (70% faster)
-  - Community-specific search
-  - No API keys needed
-  - Supports sorting and time filters
+  - Search all of Reddit
+  - Community-specific search (subreddit filtering)
+  - Sort by: Hot, New, Top, Relevance
+  - Time filters: 24h, Week, Month, Year, All Time
+  - No rate limits for reasonable use
 
 ---
 
 ## Testing Steps
 
-### 1. Test Twitter/X
+### 1. Test Reddit (FREE!)
 
 **Configuration:**
 ```
-Apify Token: [Your token]
-Platforms: ✓ Twitter/X
-Keywords: 
-  prior authorization pain management
-  interventional pain billing
-Max Items: 30
-```
-
-**Twitter Options:**
-- Exclude retweets: ✓ (checked)
-- Verified only: ☐ (unchecked)
-- Minimum likes: 0
-
-**Expected Results:**
-- 30 tweets about pain management topics
-- No retweets included
-- Recent tweets (sorted by Latest)
-- Author names, engagement metrics, URLs
-
-**Cost Estimate:**
-- ~$0.02 for 30 tweets
-
----
-
-### 2. Test Reddit
-
-**Configuration:**
-```
-Apify Token: [Your token]
 Platforms: ✓ Reddit
 Keywords:
   prior authorization pain management
   interventional pain billing
-Max Items: 30
+Max Items: 50
 ```
 
 **Reddit Options:**
@@ -82,38 +43,36 @@ Max Items: 30
 - Subreddits: medicine, healthcare (optional)
 
 **Expected Results:**
-- 30 Reddit posts about pain management
+- 50 Reddit posts about pain management
 - From relevant subreddits
 - Post titles, content, upvotes, comments
 - Subreddit names included
 
-**Cost Estimate:**
-- ~$0.06 for 30 posts (actor start + items)
+**Cost**: FREE!
 
 ---
 
-### 3. Test All Three Platforms
+### 2. Test Both Platforms
 
 **Configuration:**
 ```
 Apify Token: [Your token]
-Platforms: ✓ LinkedIn ✓ Twitter/X ✓ Reddit
+Platforms: ✓ LinkedIn ✓ Reddit
 Keywords:
   prior authorization pain management
-Max Items: 20 per platform
+Max Items: 25 per platform
 ```
 
 **Expected Results:**
-- 60 total posts (20 from each platform)
-- Mixed content from all 3 sources
+- 50 total posts (25 from each platform)
+- Mixed content from both sources
 - Platform badges showing source
 - All filters work correctly
 
 **Cost Estimate:**
-- LinkedIn: ~$0.40
-- Twitter: ~$0.02
-- Reddit: ~$0.06
-- **Total: ~$0.48**
+- LinkedIn: ~$0.50
+- Reddit: FREE
+- **Total: ~$0.50**
 
 ---
 
@@ -128,51 +87,37 @@ Max Items: 20 per platform
 - [ ] Platform badges show correct platform
 
 ### ✅ Functionality
-- [ ] Platform filter works (show only Twitter, only Reddit, etc.)
+- [ ] Platform filter works (show only LinkedIn, only Reddit, etc.)
 - [ ] Topic filter works
 - [ ] Date range filter works
 - [ ] Sorting by engagement works
-- [ ] Bookmark feature works for all platforms
-- [ ] Save influencer works for all platforms
-- [ ] Trending keywords includes all platforms
+- [ ] Bookmark feature works for both platforms
+- [ ] Save influencer works for both platforms
+- [ ] Trending keywords includes both platforms
 
 ### ✅ Performance
 - [ ] Loading completes within reasonable time
 - [ ] No errors in browser console
 - [ ] Cache works (24-hour expiry)
-- [ ] Demo mode still works with 3 platforms
+- [ ] Demo mode still works with 2 platforms
 
 ---
 
 ## Troubleshooting
 
-### Twitter Issues
-
-**Problem**: No tweets returned
-- **Check**: Keywords might be too specific
-- **Solution**: Try broader terms like "pain management" or "prior authorization"
-
-**Problem**: Getting old tweets
-- **Check**: Twitter actor sorts by "Latest" by default
-- **Solution**: Already configured correctly in code
-
-**Problem**: Too many retweets
-- **Check**: "Exclude retweets" checkbox
-- **Solution**: Should be checked by default
-
 ### Reddit Issues
 
 **Problem**: No posts returned
-- **Check**: Subreddit filter might be too restrictive
-- **Solution**: Leave subreddits empty to search all of Reddit
+- **Check**: Keywords might be too specific
+- **Solution**: Try broader terms like "pain management" or "prior authorization"
 
-**Problem**: Slow performance
-- **Check**: Fast Mode setting
-- **Solution**: Already enabled in code (fastMode: true)
+**Problem**: Subreddit filter not working
+- **Check**: Subreddit names must be exact (no r/ prefix)
+- **Solution**: Use comma-separated list: `medicine, healthcare, medicalbilling`
 
-**Problem**: Getting NSFW content
-- **Check**: NSFW filter
-- **Solution**: Add `includeNSFW: false` to input if needed
+**Problem**: Getting old posts
+- **Check**: Time range filter
+- **Solution**: Set to "Past Week" or "Past Month" for recent content
 
 ### General Issues
 
@@ -192,22 +137,6 @@ Max Items: 20 per platform
 ---
 
 ## Expected Data Structure
-
-### Twitter Post
-```javascript
-{
-  date: "2025-02-09T10:30:00.000Z",
-  author: "@HealthcareUser",
-  authorUrl: "https://twitter.com/HealthcareUser",
-  content: "Just spent 3 hours on prior authorization...",
-  platform: "twitter",
-  likes: 45,
-  comments: 12,
-  shares: 8,
-  url: "https://twitter.com/i/status/1234567890",
-  topic: "prior authorization pain management"
-}
-```
 
 ### Reddit Post
 ```javascript
@@ -230,15 +159,11 @@ Max Items: 20 per platform
 
 ## Cost Breakdown
 
-### Twitter Pricing (apidojo/twitter-scraper-lite)
-- **Query cost**: $0.016 per query (includes first ~40 tweets)
-- **Additional tweets**: $0.0004 per tweet (Tier 1)
-- **Example**: 30 tweets = $0.016 + (0 × $0.0004) = ~$0.02
-
-### Reddit Pricing (harshmaur/reddit-scraper-pro)
-- **Actor start**: $0.02 per run
-- **Per item**: $0.002 per post
-- **Example**: 30 posts = $0.02 + (30 × $0.002) = $0.08
+### Reddit Pricing
+- **Cost**: FREE (uses Reddit's public JSON API)
+- **No authentication required**
+- **No API token needed**
+- **No rate limits for reasonable use**
 
 ### LinkedIn Pricing (existing)
 - **~$1-2 per 100 posts**
@@ -248,13 +173,12 @@ Max Items: 20 per platform
 
 ## Next Steps After Testing
 
-1. ✅ **Verify Twitter works** - Check data quality and relevance
-2. ✅ **Verify Reddit works** - Check subreddit coverage
-3. ✅ **Test all 3 platforms together** - Ensure no conflicts
-4. ✅ **Test filters** - Platform, topic, date range
-5. ✅ **Test saved features** - Bookmarks, keywords, influencers
-6. ✅ **Test trending keywords** - Should include all 3 platforms
-7. ✅ **Test demo mode** - Should show 50 posts (17+17+16)
+1. ✅ **Verify Reddit works** - Check data quality and relevance
+2. ✅ **Test both platforms together** - Ensure no conflicts
+3. ✅ **Test filters** - Platform, topic, date range
+4. ✅ **Test saved features** - Bookmarks, keywords, influencers
+5. ✅ **Test trending keywords** - Should include both platforms
+6. ✅ **Test demo mode** - Should show 50 posts (25+25)
 
 ---
 
@@ -262,30 +186,26 @@ Max Items: 20 per platform
 
 Your dashboard is working correctly when:
 
-- ✅ All 3 platforms fetch data successfully
+- ✅ Both platforms fetch data successfully
 - ✅ Data is relevant to keywords
 - ✅ Platform badges show correctly
-- ✅ Filters work for all platforms
+- ✅ Filters work for both platforms
 - ✅ Saved features work across platforms
-- ✅ No authentication errors
-- ✅ Costs are reasonable
+- ✅ No authentication errors for Reddit
+- ✅ Costs are reasonable (Reddit is free!)
 - ✅ Performance is acceptable
 
 ---
 
 ## Support Resources
 
-### Twitter Actor
-- **Documentation**: https://apify.com/apidojo/twitter-scraper-lite
-- **Advanced search syntax**: Use Twitter's search operators
-- **Examples**: See actor documentation for query examples
+### Reddit Public API
+- **Documentation**: https://www.reddit.com/dev/api
+- **Search endpoint**: `/search.json`
+- **No authentication required**
+- **Free to use**
 
-### Reddit Actor
-- **Documentation**: https://apify.com/harshmaur/reddit-scraper-pro
-- **Fast Mode**: Enabled by default for better performance
-- **Community search**: Use `withinCommunity` for specific subreddits
-
-### Apify Platform
+### Apify Platform (for LinkedIn)
 - **API Docs**: https://docs.apify.com/api/v2
 - **Pricing**: Check your usage in Apify Console
 - **Support**: Contact Apify support for actor-specific issues
@@ -294,16 +214,27 @@ Your dashboard is working correctly when:
 
 ## Quick Test Command
 
-**Minimal test (fastest, cheapest):**
+**Minimal test (fastest, free):**
 ```
-Platforms: ✓ Twitter/X ✓ Reddit
+Platforms: ✓ Reddit
 Keywords: pain management
-Max Items: 10
+Max Items: 20
 ```
 
-**Expected cost**: ~$0.05
+**Expected cost**: FREE
+**Expected time**: 30 seconds
+**Expected results**: 20 Reddit posts
+
+**Full test (both platforms):**
+```
+Platforms: ✓ LinkedIn ✓ Reddit
+Keywords: prior authorization pain management
+Max Items: 25
+```
+
+**Expected cost**: ~$0.50 (LinkedIn only)
 **Expected time**: 1-2 minutes
-**Expected results**: 20 posts total (10 Twitter + 10 Reddit)
+**Expected results**: 50 posts total (25 LinkedIn + 25 Reddit)
 
 ---
 

@@ -319,8 +319,7 @@
                 <strong>📱 Supported Platforms:</strong>
                 <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
                     <li><strong>LinkedIn:</strong> Professional network (requires li_at cookie)</li>
-                    <li><strong>Twitter/X:</strong> Social media mentions (no auth needed)</li>
-                    <li><strong>Reddit:</strong> Community discussions (no auth needed)</li>
+                    <li><strong>Reddit:</strong> Community discussions (no auth needed - free!)</li>
                 </ul>
                 <br>
                 <strong>⚡ Performance Tips:</strong>
@@ -349,13 +348,9 @@
                             <input type="checkbox" id="platformLinkedIn" style="margin-right: 0.5rem;" checked />
                             🔗 LinkedIn (Professional Network)
                         </label>
-                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer; margin-bottom: 0.5rem;">
-                            <input type="checkbox" id="platformTwitter" style="margin-right: 0.5rem;" />
-                            🐦 Twitter/X (Social Media)
-                        </label>
                         <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
-                            <input type="checkbox" id="platformReddit" style="margin-right: 0.5rem;" />
-                            🤖 Reddit (Communities)
+                            <input type="checkbox" id="platformReddit" style="margin-right: 0.5rem;" checked />
+                            🤖 Reddit (Communities - Free!)
                         </label>
                     </div>
                 </div>
@@ -404,30 +399,9 @@ peer to peer appeals</textarea>
             
 
             <!-- Twitter-specific fields -->
-            <div id="twitterFields" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #1DA1F2;">
-                <h4 style="color: #1DA1F2; margin-bottom: 0.8rem;">🐦 Twitter/X Options (Optional)</h4>
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
-                            <input type="checkbox" id="twitterVerifiedOnly" style="margin-right: 0.5rem;" />
-                            Verified users only
-                        </label>
-                    </div>
-                    <div class="filter-group">
-                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
-                            <input type="checkbox" id="twitterExcludeRetweets" style="margin-right: 0.5rem;" checked />
-                            Exclude retweets
-                        </label>
-                    </div>
-                    <div class="filter-group">
-                        <label>Minimum Likes</label>
-                        <input type="number" id="twitterMinLikes" value="0" min="0" />
-                    </div>
-                </div>
-            </div>
             
             <!-- Reddit-specific fields -->
-            <div id="redditFields" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #FF4500;">
+            <div id="redditFields" style="display: block; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #FF4500;">
                 <h4 style="color: #FF4500; margin-bottom: 0.8rem;">🤖 Reddit Options (Optional)</h4>
                 <div class="filters-grid">
                     <div class="filter-group">
@@ -491,7 +465,6 @@ peer to peer appeals</textarea>
                     <select id="platformFilter">
                         <option value="all">All Platforms</option>
                         <option value="linkedin">🔗 LinkedIn</option>
-                        <option value="twitter">🐦 Twitter/X</option>
                         <option value="reddit">🤖 Reddit</option>
                     </select>
                 </div>
@@ -626,9 +599,6 @@ peer to peer appeals</textarea>
                     </button>
                     <button class="btn btn-secondary" onclick="filterInfluencers('linkedin')" id="filterLinkedIn">
                         🔗 LinkedIn (<span id="countLinkedIn">0</span>)
-                    </button>
-                    <button class="btn btn-secondary" onclick="filterInfluencers('twitter')" id="filterTwitter">
-                        🐦 Twitter (<span id="countTwitter">0</span>)
                     </button>
                     <button class="btn btn-secondary" onclick="filterInfluencers('reddit')" id="filterReddit">
                         🤖 Reddit (<span id="countReddit">0</span>)
@@ -888,7 +858,6 @@ peer to peer appeals</textarea>
             
             // Add platform toggle listeners
             document.getElementById('platformLinkedIn').addEventListener('change', togglePlatformFields);
-            document.getElementById('platformTwitter').addEventListener('change', togglePlatformFields);
             document.getElementById('platformReddit').addEventListener('change', togglePlatformFields);
             togglePlatformFields(); // Initial state
         }
@@ -896,11 +865,9 @@ peer to peer appeals</textarea>
         // Toggle platform-specific fields
         function togglePlatformFields() {
             const linkedinChecked = document.getElementById('platformLinkedIn').checked;
-            const twitterChecked = document.getElementById('platformTwitter').checked;
             const redditChecked = document.getElementById('platformReddit').checked;
             
             document.getElementById('linkedinFields').style.display = linkedinChecked ? 'block' : 'none';
-            document.getElementById('twitterFields').style.display = twitterChecked ? 'block' : 'none';
             document.getElementById('redditFields').style.display = redditChecked ? 'block' : 'none';
         }
 
@@ -1869,7 +1836,7 @@ peer to peer appeals</textarea>
             currentInfluencerFilter = platform;
             
             // Update button styles
-            ['All', 'LinkedIn', 'Twitter', 'Reddit'].forEach(p => {
+            ['All', 'LinkedIn', 'Reddit'].forEach(p => {
                 const btn = document.getElementById(`filter${p}`);
                 if (btn) {
                     if (p.toLowerCase() === platform || (p === 'All' && platform === 'all')) {
@@ -1904,7 +1871,6 @@ peer to peer appeals</textarea>
             
             const platformBadges = {
                 'linkedin': { icon: '🔗', name: 'LinkedIn', color: '#0077b5' },
-                'twitter': { icon: '🐦', name: 'Twitter', color: '#1DA1F2' },
                 'reddit': { icon: '🤖', name: 'Reddit', color: '#FF4500' }
             };
             
@@ -1976,7 +1942,6 @@ peer to peer appeals</textarea>
         function updateInfluencerCounts() {
             document.getElementById('countAll').textContent = savedInfluencers.length;
             document.getElementById('countLinkedIn').textContent = savedInfluencers.filter(i => i.platform === 'linkedin').length;
-            document.getElementById('countTwitter').textContent = savedInfluencers.filter(i => i.platform === 'twitter').length;
             document.getElementById('countReddit').textContent = savedInfluencers.filter(i => i.platform === 'reddit').length;
         }
         
@@ -3280,11 +3245,10 @@ peer to peer appeals</textarea>
             const maxItems = parseInt(document.getElementById('maxItems').value);
             
             const linkedinEnabled = document.getElementById('platformLinkedIn').checked;
-            const twitterEnabled = document.getElementById('platformTwitter').checked;
             const redditEnabled = document.getElementById('platformReddit').checked;
 
             console.log('=== Starting Multi-Platform Fetch ===');
-            console.log('Platforms enabled:', { linkedinEnabled, twitterEnabled, redditEnabled });
+            console.log('Platforms enabled:', { linkedinEnabled, redditEnabled });
             console.log('Max items per platform:', maxItems);
             console.log('Token present:', !!token);
 
@@ -3294,7 +3258,7 @@ peer to peer appeals</textarea>
                 return;
             }
             
-            if (!linkedinEnabled && !twitterEnabled && !redditEnabled) {
+            if (!linkedinEnabled && !redditEnabled) {
                 alert('Please select at least one platform');
                 return;
             }
@@ -3336,22 +3300,15 @@ peer to peer appeals</textarea>
                 
                 // Fetch from each enabled platform
                 if (linkedinEnabled) {
-                    updateLoadingStatus('� Fetching LinkedIn posts...');
+                    updateLoadingStatus('💼 Fetching LinkedIn posts...');
                     const linkedinData = await fetchLinkedInData(token, keywords, maxItems);
                     platformResults.push({ platform: 'LinkedIn', count: linkedinData.length });
                     allData = allData.concat(linkedinData);
                 }
                 
-                if (twitterEnabled) {
-                    updateLoadingStatus('🐦 Fetching Twitter/X posts...');
-                    const twitterData = await fetchTwitterData(token, keywords, maxItems);
-                    platformResults.push({ platform: 'Twitter', count: twitterData.length });
-                    allData = allData.concat(twitterData);
-                }
-                
                 if (redditEnabled) {
                     updateLoadingStatus('🤖 Fetching Reddit discussions...');
-                    const redditData = await fetchRedditData(token, keywords, maxItems);
+                    const redditData = await fetchRedditData(keywords, maxItems);
                     platformResults.push({ platform: 'Reddit', count: redditData.length });
                     allData = allData.concat(redditData);
                 }
@@ -3381,73 +3338,8 @@ peer to peer appeals</textarea>
             }
         }
         
-        // Fetch Twitter data
-        async function fetchTwitterData(token, keywords, maxItems) {
-            const verifiedOnly = document.getElementById('twitterVerifiedOnly').checked;
-            const excludeRetweets = document.getElementById('twitterExcludeRetweets').checked;
-            const minLikes = parseInt(document.getElementById('twitterMinLikes').value) || 0;
-            
-            const allResults = [];
-            
-            for (const keyword of keywords) {
-                try {
-                    console.log(`🐦 Fetching Twitter data for: "${keyword}"`);
-                    
-                    // Call Netlify Function instead of direct API
-                    const url = `/.netlify/functions/fetch-twitter`;
-                    
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            token: token,
-                            keyword: keyword,
-                            maxItems: Math.ceil(maxItems / keywords.length),
-                            verifiedOnly: verifiedOnly,
-                            excludeRetweets: excludeRetweets,
-                            minLikes: minLikes
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error('   Twitter API Error Response:', errorData);
-                        throw new Error(`Twitter API Error: ${response.status} - ${errorData.error}`);
-                    }
-
-                    const rawData = await response.json();
-                    console.log(`   Retrieved ${rawData.length} tweets`);
-                    
-                    if (rawData.length > 0) {
-                        console.log('   Sample tweet:', rawData[0]);
-                    }
-                    
-                    // Normalize data
-                    const normalized = rawData.map(item => ({
-                        date: item.createdAt || new Date().toISOString(),
-                        author: item.author?.name || item.author?.userName || 'Unknown',
-                        authorUrl: item.author?.url || item.author?.twitterUrl || '#',
-                        content: item.text || '',
-                        platform: 'twitter',
-                        likes: item.likeCount || 0,
-                        comments: item.replyCount || 0,
-                        shares: item.retweetCount || 0,
-                        url: item.url || item.twitterUrl || '#',
-                        topic: keyword
-                    }));
-                    
-                    allResults.push(...normalized);
-                    console.log(`   ✓ Added ${normalized.length} tweets to results`);
-                } catch (error) {
-                    console.error(`   ✗ Error fetching Twitter data for "${keyword}":`, error);
-                }
-            }
-            
-            return allResults;
-        }
-        
-        // Fetch Reddit data
-        async function fetchRedditData(token, keywords, maxItems) {
+        // Fetch Reddit data using Reddit's public JSON API
+        async function fetchRedditData(keywords, maxItems) {
             const sort = document.getElementById('redditSort').value;
             const time = document.getElementById('redditTime').value;
             const subreddits = document.getElementById('redditSubreddits').value.trim();
@@ -3458,49 +3350,62 @@ peer to peer appeals</textarea>
                 try {
                     console.log(`🤖 Fetching Reddit data for: "${keyword}"`);
                     
-                    // Call Netlify Function instead of direct API
-                    const url = `/.netlify/functions/fetch-reddit`;
+                    // Build Reddit search URL
+                    let searchUrl = 'https://www.reddit.com/search.json';
+                    const params = new URLSearchParams({
+                        q: keyword,
+                        limit: Math.ceil(maxItems / keywords.length),
+                        sort: sort,
+                        t: time,
+                        type: 'link'
+                    });
+                    
+                    // Add subreddit filter if specified
+                    if (subreddits) {
+                        const subredditList = subreddits.split(',').map(s => s.trim())[0];
+                        searchUrl = `https://www.reddit.com/r/${subredditList}/search.json`;
+                        params.set('restrict_sr', 'true');
+                    }
+                    
+                    const url = `${searchUrl}?${params.toString()}`;
+                    console.log(`   Fetching from: ${url}`);
                     
                     const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            token: token,
-                            keyword: keyword,
-                            maxItems: Math.ceil(maxItems / keywords.length),
-                            sort: sort,
-                            time: time,
-                            subreddits: subreddits
-                        })
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (compatible; PainMed-Dashboard/1.0)'
+                        }
                     });
 
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error('   Reddit API Error Response:', errorData);
-                        throw new Error(`Reddit API Error: ${response.status} - ${errorData.error}`);
+                        console.error(`   Reddit API Error: ${response.status}`);
+                        throw new Error(`Reddit API Error: ${response.status}`);
                     }
 
-                    const rawData = await response.json();
-                    console.log(`   Retrieved ${rawData.length} posts`);
+                    const data = await response.json();
+                    const posts = data.data.children || [];
+                    console.log(`   Retrieved ${posts.length} posts`);
                     
-                    if (rawData.length > 0) {
-                        console.log('   Sample post:', rawData[0]);
+                    if (posts.length > 0) {
+                        console.log('   Sample post:', posts[0].data);
                     }
                     
                     // Normalize data
-                    const normalized = rawData.map(item => ({
-                        date: item.createdAt || new Date().toISOString(),
-                        author: item.authorName || 'Unknown',
-                        authorUrl: `https://reddit.com/user/${item.authorName}`,
-                        content: item.title + (item.body ? '\n\n' + item.body : ''),
-                        platform: 'reddit',
-                        likes: item.upVotes || 0,
-                        comments: item.commentsCount || 0,
-                        shares: 0,
-                        url: item.postUrl || item.url || '#',
-                        topic: keyword,
-                        subreddit: item.subredditName || item.communityName
-                    }));
+                    const normalized = posts.map(item => {
+                        const post = item.data;
+                        return {
+                            date: new Date(post.created_utc * 1000).toISOString(),
+                            author: post.author || 'Unknown',
+                            authorUrl: `https://reddit.com/user/${post.author}`,
+                            content: post.title + (post.selftext ? '\n\n' + post.selftext : ''),
+                            platform: 'reddit',
+                            likes: post.ups || 0,
+                            comments: post.num_comments || 0,
+                            shares: 0,
+                            url: `https://reddit.com${post.permalink}`,
+                            topic: keyword,
+                            subreddit: post.subreddit
+                        };
+                    });
                     
                     allResults.push(...normalized);
                     console.log(`   ✓ Added ${normalized.length} posts to results`);
@@ -3647,7 +3552,7 @@ peer to peer appeals</textarea>
             const now = new Date();
             
             // LinkedIn demo data
-            for (let i = 0; i < 17; i++) {
+            for (let i = 0; i < 25; i++) {
                 const keyword = keywords[i % keywords.length];
                 const daysAgo = Math.floor(Math.random() * 30);
                 const date = new Date(now);
@@ -3667,29 +3572,8 @@ peer to peer appeals</textarea>
                 });
             }
             
-            // Twitter demo data
-            for (let i = 0; i < 17; i++) {
-                const keyword = keywords[i % keywords.length];
-                const daysAgo = Math.floor(Math.random() * 14);
-                const date = new Date(now);
-                date.setDate(date.getDate() - daysAgo);
-                
-                data.push({
-                    date: date.toISOString(),
-                    author: `@HealthcareUser${i + 1}`,
-                    authorUrl: `https://twitter.com/HealthcareUser${i + 1}`,
-                    content: `Just spent 3 hours on ${keyword}. There has to be a better way! #healthcare #priorauth #frustrated`,
-                    platform: 'twitter',
-                    likes: Math.floor(Math.random() * 100) + 20,
-                    comments: Math.floor(Math.random() * 30) + 5,
-                    shares: Math.floor(Math.random() * 15),
-                    url: `https://twitter.com/i/status/1${700000000 + i}`,
-                    topic: keyword
-                });
-            }
-            
             // Reddit demo data
-            for (let i = 0; i < 16; i++) {
+            for (let i = 0; i < 25; i++) {
                 const keyword = keywords[i % keywords.length];
                 const daysAgo = Math.floor(Math.random() * 21);
                 const date = new Date(now);
