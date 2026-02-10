@@ -304,23 +304,30 @@
             PainMed-PA Social Listening Dashboard
         </h1>
         <p class="subtitle">
-            Real-time LinkedIn Analytics | Pain Management Intelligence | A Probe Practice Solutions Company
+            Multi-Platform Intelligence | Healthcare Providers · Social Media · Community Discussions | A Probe Practice Solutions Company
         </p>
     </div>
 
     <div class="container">
         <!-- Configuration Panel -->
         <div class="filters-panel" id="configPanel">
-            <h3 style="margin-bottom: 1rem;">⚙️ LinkedIn Data Configuration</h3>
+            <h3 style="margin-bottom: 1rem;">⚙️ Multi-Platform Data Configuration</h3>
             
             <div style="background: #E0F2F1; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; color: #2E5C9A; border-left: 4px solid #4DAFA7;">
-                <strong>✓ Setup:</strong> Enter your Apify API token, LinkedIn cookie, and keywords to fetch LinkedIn data. Data is cached for 24 hours.
+                <strong>✓ Multi-Platform Intelligence:</strong> Gather insights from professional networks, healthcare providers, social media, and community discussions.
                 <br><br>
+                <strong>📱 Supported Platforms:</strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+                    <li><strong>LinkedIn:</strong> Professional network (requires li_at cookie)</li>
+                    <li><strong>Twitter/X:</strong> Social media mentions (no auth needed)</li>
+                    <li><strong>Reddit:</strong> Community discussions (no auth needed)</li>
+                </ul>
+                <br>
                 <strong>⚡ Performance Tips:</strong>
                 <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
                     <li>Use 3-5 keywords for best speed</li>
-                    <li>Start with 30-50 posts for faster results</li>
-                    <li>Each keyword becomes a separate topic in the dashboard</li>
+                    <li>Start with 30-50 items per platform</li>
+                    <li>Try <strong>DEMO MODE</strong> to test without API calls!</li>
                 </ul>
             </div>
             
@@ -336,24 +343,28 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label>LinkedIn Cookie (li_at) *</label>
-                    <input type="password" id="linkedinCookie" placeholder="Your li_at cookie" value="" />
+                    <label>Select Platforms *</label>
+                    <div style="border: 1px solid #ddd; border-radius: 6px; padding: 0.5rem; background: white;">
+                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer; margin-bottom: 0.5rem;">
+                            <input type="checkbox" id="platformLinkedIn" style="margin-right: 0.5rem;" checked />
+                            🔗 LinkedIn (Professional Network)
+                        </label>
+                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer; margin-bottom: 0.5rem;">
+                            <input type="checkbox" id="platformTwitter" style="margin-right: 0.5rem;" />
+                            🐦 Twitter/X (Social Media)
+                        </label>
+                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="platformReddit" style="margin-right: 0.5rem;" />
+                            🤖 Reddit (Communities)
+                        </label>
+                    </div>
                 </div>
                 
                 <div class="filter-group">
-                    <label>Search Type</label>
-                    <select id="searchType">
-                        <option value="content">Posts & Articles</option>
-                        <option value="people">People</option>
-                        <option value="companies">Companies</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>Max Posts</label>
-                    <input type="number" id="maxPosts" value="50" min="5" max="500" />
+                    <label>Max Items Per Platform</label>
+                    <input type="number" id="maxItems" value="50" min="5" max="500" />
                     <small style="color: #7f8c8d; font-size: 0.8rem; margin-top: 0.3rem;">
-                        💡 Tip: Start with 30-50 posts for faster results
+                        💡 Tip: Start with 30-50 items for faster results
                     </small>
                 </div>
             </div>
@@ -367,19 +378,101 @@ Medicare pain procedures
 RCM pain management
 peer to peer appeals</textarea>
                 <small style="color: #7f8c8d; font-size: 0.85rem;">
-                    Each keyword = one topic. 💡 <strong>Fewer keywords = faster results</strong> (3-5 recommended for 100+ posts)
+                    Each keyword = one topic. 💡 <strong>Fewer keywords = faster results</strong> (3-5 recommended)
                 </small>
             </div>
             
-            <div style="margin-top: 1rem;">
-                <button class="btn btn-primary" onclick="fetchLinkedInData()">🚀 Fetch LinkedIn Data</button>
+            <!-- LinkedIn-specific fields -->
+            <div id="linkedinFields" style="display: block; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #0077b5;">
+                <h4 style="color: #0077b5; margin-bottom: 0.8rem;">🔗 LinkedIn Options (Required if LinkedIn selected)</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>LinkedIn Cookie (li_at) *</label>
+                        <input type="password" id="linkedinCookie" placeholder="Your li_at cookie" value="" />
+                        <small style="color: #7f8c8d; font-size: 0.75rem;">See CREDENTIALS_GUIDE.md for help</small>
+                    </div>
+                    <div class="filter-group">
+                        <label>Search Type</label>
+                        <select id="linkedinSearchType">
+                            <option value="content">Posts & Articles</option>
+                            <option value="people">People</option>
+                            <option value="companies">Companies</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Twitter-specific fields -->
+            <div id="twitterFields" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #1DA1F2;">
+                <h4 style="color: #1DA1F2; margin-bottom: 0.8rem;">🐦 Twitter/X Options (Optional)</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="twitterVerifiedOnly" style="margin-right: 0.5rem;" />
+                            Verified users only
+                        </label>
+                    </div>
+                    <div class="filter-group">
+                        <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="twitterExcludeRetweets" style="margin-right: 0.5rem;" checked />
+                            Exclude retweets
+                        </label>
+                    </div>
+                    <div class="filter-group">
+                        <label>Minimum Likes</label>
+                        <input type="number" id="twitterMinLikes" value="0" min="0" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reddit-specific fields -->
+            <div id="redditFields" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #FF4500;">
+                <h4 style="color: #FF4500; margin-bottom: 0.8rem;">🤖 Reddit Options (Optional)</h4>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="redditSort">
+                            <option value="hot">Hot</option>
+                            <option value="new">New</option>
+                            <option value="top">Top</option>
+                            <option value="relevance">Relevance</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Time Range</label>
+                        <select id="redditTime">
+                            <option value="day">Past 24 Hours</option>
+                            <option value="week" selected>Past Week</option>
+                            <option value="month">Past Month</option>
+                            <option value="year">Past Year</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Subreddits (comma-separated)</label>
+                        <input type="text" id="redditSubreddits" placeholder="e.g., medicine, healthcare" />
+                        <small style="color: #7f8c8d; font-size: 0.75rem;">Leave empty to search all</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+                <button class="btn btn-primary" onclick="fetchMultiPlatformData()">🚀 Fetch Multi-Platform Data</button>
+                <button class="btn btn-secondary" onclick="loadDemoData()" style="background: #f39c12;">
+                    🎭 Try Demo Mode
+                </button>
+                <small style="color: #7f8c8d; margin-left: 0.5rem;">
+                    Demo mode loads sample data without API calls
+                </small>
             </div>
         </div>
 
         <!-- Loading State -->
         <div class="filters-panel" id="loadingPanel" style="display: none; text-align: center;">
             <div style="display: inline-block; border: 4px solid #f3f3f3; border-top: 4px solid #4DAFA7; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
-            <p id="loadingStatus" style="font-size: 1.1rem; color: #2E5C9A;">Fetching LinkedIn data...</p>
+            <p id="loadingStatus" style="font-size: 1.1rem; color: #2E5C9A;">Fetching data...</p>
+            <div id="loadingDetails" style="margin-top: 1rem; font-size: 0.9rem; color: #6c757d;"></div>
         </div>
         
         <style>
@@ -393,6 +486,16 @@ peer to peer appeals</textarea>
         <div class="filters-panel" id="filtersPanel" style="display: none;">
             <h3 style="margin-bottom: 1rem;">🔍 Filters</h3>
             <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Platform</label>
+                    <select id="platformFilter">
+                        <option value="all">All Platforms</option>
+                        <option value="linkedin">🔗 LinkedIn</option>
+                        <option value="twitter">🐦 Twitter/X</option>
+                        <option value="reddit">🤖 Reddit</option>
+                    </select>
+                </div>
+                
                 <div class="filter-group">
                     <label>Topics (Select Multiple)</label>
                     <div style="border: 1px solid #ddd; border-radius: 6px; padding: 0.5rem; max-height: 150px; overflow-y: auto; background: white;">
@@ -424,6 +527,8 @@ peer to peer appeals</textarea>
                 <button class="btn btn-secondary" onclick="reloadData()">← Back to Config</button>
                 <button class="btn btn-secondary" onclick="debugData()" style="background: #6c757d;">🔍 Debug Data</button>
                 <button class="btn btn-secondary" onclick="showBookmarks()" style="background: #f39c12;">⭐ Bookmarks (<span id="bookmarkCount">0</span>)</button>
+                <button class="btn btn-secondary" onclick="showSavedKeywords()" style="background: #9b59b6;">🔑 Keywords</button>
+                <button class="btn btn-secondary" onclick="showInfluencers()" style="background: #e74c3c;">👥 Influencers</button>
             </div>
         </div>
 
@@ -459,6 +564,84 @@ peer to peer appeals</textarea>
                     </div>
                     <div id="bookmarkedPostsList"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Saved Keywords Panel -->
+        <div class="filters-panel" id="savedKeywordsPanel" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3>🔑 Saved Keyword Lists</h3>
+                <button class="btn btn-secondary" onclick="hideSavedKeywords()">← Back to Dashboard</button>
+            </div>
+            
+            <div style="background: #E0F2F1; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-size: 0.9rem; color: #2E5C9A; border-left: 4px solid #9b59b6;">
+                <strong>💡 About Saved Keywords:</strong> Save keyword lists for quick reuse. Perfect for recurring searches or different campaign types.
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <!-- Saved Lists -->
+                <div>
+                    <h4 style="color: #2E5C9A; margin-bottom: 1rem;">📋 Your Keyword Lists</h4>
+                    <div id="savedKeywordsList"></div>
+                    
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+                        <h5 style="color: #2E5C9A; margin-bottom: 0.8rem;">➕ Create New List</h5>
+                        <input type="text" id="newKeywordListName" placeholder="List name (e.g., 'PA Denials')" 
+                               style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 0.5rem;" />
+                        <textarea id="newKeywordListContent" rows="6" placeholder="Enter keywords (one per line)"
+                                  style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 0.5rem;"></textarea>
+                        <button class="btn btn-primary" onclick="saveKeywordList()" style="width: 100%;">
+                            💾 Save Keyword List
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- List Preview -->
+                <div>
+                    <h4 style="color: #2E5C9A; margin-bottom: 1rem;">👁️ Preview & Actions</h4>
+                    <div id="keywordListPreview" style="min-height: 200px;">
+                        <p style="color: #95a5a6; text-align: center; padding: 3rem;">
+                            Select a keyword list to preview
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Influencers Panel -->
+        <div class="filters-panel" id="influencersPanel" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3>👥 Saved Influencer Profiles</h3>
+                <button class="btn btn-secondary" onclick="hideInfluencers()">← Back to Dashboard</button>
+            </div>
+            
+            <div style="background: #FFE5E5; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-size: 0.9rem; color: #2E5C9A; border-left: 4px solid #e74c3c;">
+                <strong>💡 About Influencers:</strong> Track key authors, providers, and thought leaders. Monitor their activity and engagement across platforms.
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button class="btn btn-secondary" onclick="filterInfluencers('all')" id="filterAll" style="background: #2E5C9A; color: white;">
+                        All (<span id="countAll">0</span>)
+                    </button>
+                    <button class="btn btn-secondary" onclick="filterInfluencers('linkedin')" id="filterLinkedIn">
+                        🔗 LinkedIn (<span id="countLinkedIn">0</span>)
+                    </button>
+                    <button class="btn btn-secondary" onclick="filterInfluencers('twitter')" id="filterTwitter">
+                        🐦 Twitter (<span id="countTwitter">0</span>)
+                    </button>
+                    <button class="btn btn-secondary" onclick="filterInfluencers('reddit')" id="filterReddit">
+                        🤖 Reddit (<span id="countReddit">0</span>)
+                    </button>
+                </div>
+            </div>
+            
+            <div id="influencersList"></div>
+            
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <button class="btn btn-secondary" onclick="exportInfluencers()" style="background: #4DAFA7;">
+                    📥 Export All Influencers
+                </button>
             </div>
         </div>
 
@@ -538,6 +721,19 @@ peer to peer appeals</textarea>
             </div>
         </div>
 
+        <!-- Trending Keywords -->
+        <div class="chart-card" style="border-left: 4px solid #f39c12;">
+            <h3>🔥 Trending Keywords & Topics</h3>
+            <p style="margin-bottom: 1rem; color: #7f8c8d; font-size: 0.85rem;">
+                Most frequently mentioned terms in pain management discussions
+            </p>
+            <div id="trendingKeywords">
+                <div style="text-align: center; padding: 2rem; color: #95a5a6;">
+                    Analyzing keywords...
+                </div>
+            </div>
+        </div>
+
         <!-- Lead Scoring - High Priority Posts -->
         <div class="chart-card" style="border-left: 4px solid #4DAFA7;">
             <h3>🎯 Sales Opportunities - Lead Scoring</h3>
@@ -553,26 +749,27 @@ peer to peer appeals</textarea>
 
         <!-- Posts Table -->
         <div class="table-card">
-            <h3>💬 Posts & Mentions</h3>
+            <h3>💬 Multi-Platform Posts & Mentions</h3>
             <p style="margin-bottom: 1rem; color: #7f8c8d; font-size: 0.9rem;">
-                Sorted by engagement (highest first) - Top 50 posts shown
+                Sorted by engagement (highest first) - Top 50 items shown
             </p>
             <table>
                 <thead>
                     <tr>
+                        <th>Platform</th>
                         <th>Date</th>
                         <th>Author</th>
                         <th>Topic</th>
                         <th>Content</th>
                         <th>Engagement ↓</th>
                         <th>Link</th>
-                        <th>Save</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="postsTable">
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 2rem; color: #7f8c8d;">
-                            No data loaded. Configure and fetch LinkedIn data above.
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                            No data loaded. Configure and fetch multi-platform data above.
                         </td>
                     </tr>
                 </tbody>
@@ -594,6 +791,13 @@ peer to peer appeals</textarea>
         let bookmarks = [];
         let collections = ['Sales Leads', 'Case Studies', 'Follow Up', 'Competitors'];
         
+        // Saved Keywords state
+        let savedKeywordLists = [];
+        
+        // Influencers state
+        let savedInfluencers = [];
+        let currentInfluencerFilter = 'all';
+        
         // Load bookmarks from localStorage
         function loadBookmarks() {
             const saved = localStorage.getItem('painmed_bookmarks');
@@ -612,10 +816,47 @@ peer to peer appeals</textarea>
             localStorage.setItem('painmed_bookmarks', JSON.stringify(bookmarks));
             localStorage.setItem('painmed_collections', JSON.stringify(collections));
         }
+        
+        // Load saved keyword lists
+        function loadSavedKeywords() {
+            const saved = localStorage.getItem('painmed_keyword_lists');
+            if (saved) {
+                savedKeywordLists = JSON.parse(saved);
+            }
+        }
+        
+        // Save keyword lists
+        function saveSavedKeywords() {
+            localStorage.setItem('painmed_keyword_lists', JSON.stringify(savedKeywordLists));
+        }
+        
+        // Load saved influencers
+        function loadInfluencers() {
+            const saved = localStorage.getItem('painmed_influencers');
+            if (saved) {
+                savedInfluencers = JSON.parse(saved);
+            }
+        }
+        
+        // Save influencers
+        function saveInfluencers() {
+            localStorage.setItem('painmed_influencers', JSON.stringify(savedInfluencers));
+        }
 
         // Apify configuration
         const APIFY_CONFIG = {
-            contentActorId: 'kfiWbq3boy3dWKbiL',
+            linkedin: {
+                actorId: 'kfiWbq3boy3dWKbiL',
+                name: 'LinkedIn Content Scraper'
+            },
+            twitter: {
+                actorId: 'apidojo/twitter-scraper-lite',
+                name: 'Twitter Scraper Unlimited'
+            },
+            reddit: {
+                actorId: 'harshmaur/reddit-scraper-pro',
+                name: 'Reddit Scraper Pro'
+            },
             apiBaseUrl: 'https://api.apify.com/v2'
         };
 
@@ -640,6 +881,27 @@ peer to peer appeals</textarea>
             // Load bookmarks
             loadBookmarks();
             updateBookmarkCount();
+            
+            // Load saved keywords and influencers
+            loadSavedKeywords();
+            loadInfluencers();
+            
+            // Add platform toggle listeners
+            document.getElementById('platformLinkedIn').addEventListener('change', togglePlatformFields);
+            document.getElementById('platformTwitter').addEventListener('change', togglePlatformFields);
+            document.getElementById('platformReddit').addEventListener('change', togglePlatformFields);
+            togglePlatformFields(); // Initial state
+        }
+        
+        // Toggle platform-specific fields
+        function togglePlatformFields() {
+            const linkedinChecked = document.getElementById('platformLinkedIn').checked;
+            const twitterChecked = document.getElementById('platformTwitter').checked;
+            const redditChecked = document.getElementById('platformReddit').checked;
+            
+            document.getElementById('linkedinFields').style.display = linkedinChecked ? 'block' : 'none';
+            document.getElementById('twitterFields').style.display = twitterChecked ? 'block' : 'none';
+            document.getElementById('redditFields').style.display = redditChecked ? 'block' : 'none';
         }
 
         // Load cached data
@@ -1418,12 +1680,346 @@ peer to peer appeals</textarea>
             
             alert(`Exported ${bookmarks.length} bookmarks to CSV!`);
         }
+        
+        // ============================================
+        // SAVED KEYWORDS FUNCTIONS
+        // ============================================
+        
+        // Show saved keywords panel
+        function showSavedKeywords() {
+            document.getElementById('filtersPanel').style.display = 'none';
+            document.getElementById('savedKeywordsPanel').style.display = 'block';
+            renderSavedKeywordsList();
+        }
+        
+        // Hide saved keywords panel
+        function hideSavedKeywords() {
+            document.getElementById('savedKeywordsPanel').style.display = 'none';
+            document.getElementById('filtersPanel').style.display = 'block';
+        }
+        
+        // Render saved keywords list
+        function renderSavedKeywordsList() {
+            const container = document.getElementById('savedKeywordsList');
+            
+            if (savedKeywordLists.length === 0) {
+                container.innerHTML = '<p style="color: #95a5a6; text-align: center; padding: 2rem;">No saved keyword lists yet. Create one below!</p>';
+                return;
+            }
+            
+            container.innerHTML = savedKeywordLists.map((list, index) => `
+                <div style="border: 1px solid #ddd; border-radius: 6px; padding: 1rem; margin-bottom: 1rem; background: white; cursor: pointer;"
+                     onclick="previewKeywordList(${index})">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                        <strong style="color: #2E5C9A; font-size: 1.1rem;">${list.name}</strong>
+                        <span style="color: #6c757d; font-size: 0.85rem;">${list.keywords.length} keywords</span>
+                    </div>
+                    <div style="color: #6c757d; font-size: 0.85rem; margin-bottom: 0.8rem;">
+                        Created: ${new Date(list.createdAt).toLocaleDateString()}
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="useKeywordList(${index}); event.stopPropagation();" 
+                                class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                            🚀 Use in Search
+                        </button>
+                        <button onclick="deleteKeywordList(${index}); event.stopPropagation();" 
+                                class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #E85D75;">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Preview keyword list
+        function previewKeywordList(index) {
+            const list = savedKeywordLists[index];
+            const container = document.getElementById('keywordListPreview');
+            
+            container.innerHTML = `
+                <div style="border: 2px solid #9b59b6; border-radius: 8px; padding: 1.5rem; background: white;">
+                    <h4 style="color: #2E5C9A; margin-bottom: 1rem;">${list.name}</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: #6c757d; font-size: 0.9rem;">Keywords (${list.keywords.length}):</strong>
+                        <div style="margin-top: 0.5rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; max-height: 300px; overflow-y: auto;">
+                            ${list.keywords.map(kw => `
+                                <div style="padding: 0.3rem 0; border-bottom: 1px solid #ecf0f1;">
+                                    ${kw}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div style="color: #6c757d; font-size: 0.85rem;">
+                        Created: ${new Date(list.createdAt).toLocaleDateString()}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Save new keyword list
+        function saveKeywordList() {
+            const name = document.getElementById('newKeywordListName').value.trim();
+            const content = document.getElementById('newKeywordListContent').value.trim();
+            
+            if (!name) {
+                alert('Please enter a name for the keyword list');
+                return;
+            }
+            
+            if (!content) {
+                alert('Please enter at least one keyword');
+                return;
+            }
+            
+            const keywords = content.split('\n').map(k => k.trim()).filter(k => k.length > 0);
+            
+            if (keywords.length === 0) {
+                alert('Please enter at least one keyword');
+                return;
+            }
+            
+            savedKeywordLists.push({
+                name: name,
+                keywords: keywords,
+                createdAt: new Date().toISOString()
+            });
+            
+            saveSavedKeywords();
+            
+            // Clear form
+            document.getElementById('newKeywordListName').value = '';
+            document.getElementById('newKeywordListContent').value = '';
+            
+            renderSavedKeywordsList();
+            alert(`Saved "${name}" with ${keywords.length} keywords!`);
+        }
+        
+        // Use keyword list in search
+        function useKeywordList(index) {
+            const list = savedKeywordLists[index];
+            
+            // Go back to config panel
+            hideSavedKeywords();
+            document.getElementById('filtersPanel').style.display = 'none';
+            document.getElementById('configPanel').style.display = 'block';
+            
+            // Fill in keywords
+            document.getElementById('searchKeywords').value = list.keywords.join('\n');
+            
+            alert(`Loaded "${list.name}" keywords into search box. Configure other settings and click "Fetch Multi-Platform Data".`);
+        }
+        
+        // Delete keyword list
+        function deleteKeywordList(index) {
+            const list = savedKeywordLists[index];
+            if (confirm(`Delete keyword list "${list.name}"?`)) {
+                savedKeywordLists.splice(index, 1);
+                saveSavedKeywords();
+                renderSavedKeywordsList();
+                document.getElementById('keywordListPreview').innerHTML = '<p style="color: #95a5a6; text-align: center; padding: 3rem;">Select a keyword list to preview</p>';
+            }
+        }
+        
+        // ============================================
+        // INFLUENCERS FUNCTIONS
+        // ============================================
+        
+        // Show influencers panel
+        function showInfluencers() {
+            document.getElementById('filtersPanel').style.display = 'none';
+            document.getElementById('influencersPanel').style.display = 'block';
+            renderInfluencersList();
+            updateInfluencerCounts();
+        }
+        
+        // Hide influencers panel
+        function hideInfluencers() {
+            document.getElementById('influencersPanel').style.display = 'none';
+            document.getElementById('filtersPanel').style.display = 'block';
+        }
+        
+        // Save influencer
+        function saveInfluencer(author, authorUrl, platform) {
+            // Check if already saved
+            const exists = savedInfluencers.some(inf => inf.authorUrl === authorUrl);
+            if (exists) {
+                alert('This influencer is already saved!');
+                return;
+            }
+            
+            savedInfluencers.push({
+                author: author,
+                authorUrl: authorUrl,
+                platform: platform,
+                savedAt: new Date().toISOString(),
+                notes: ''
+            });
+            
+            saveInfluencers();
+            alert(`Saved ${author} as influencer!`);
+        }
+        
+        // Check if influencer is saved
+        function isInfluencerSaved(authorUrl) {
+            return savedInfluencers.some(inf => inf.authorUrl === authorUrl);
+        }
+        
+        // Filter influencers
+        function filterInfluencers(platform) {
+            currentInfluencerFilter = platform;
+            
+            // Update button styles
+            ['All', 'LinkedIn', 'Twitter', 'Reddit'].forEach(p => {
+                const btn = document.getElementById(`filter${p}`);
+                if (btn) {
+                    if (p.toLowerCase() === platform || (p === 'All' && platform === 'all')) {
+                        btn.style.background = '#2E5C9A';
+                        btn.style.color = 'white';
+                    } else {
+                        btn.style.background = '#ecf0f1';
+                        btn.style.color = '#2E5C9A';
+                    }
+                }
+            });
+            
+            renderInfluencersList();
+        }
+        
+        // Render influencers list
+        function renderInfluencersList() {
+            const container = document.getElementById('influencersList');
+            
+            let filtered = savedInfluencers;
+            if (currentInfluencerFilter !== 'all') {
+                filtered = savedInfluencers.filter(inf => inf.platform === currentInfluencerFilter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="color: #95a5a6; text-align: center; padding: 2rem;">No influencers saved yet. Click "👥" button on any post to save the author!</p>';
+                return;
+            }
+            
+            // Sort by most recent
+            filtered.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+            
+            const platformBadges = {
+                'linkedin': { icon: '🔗', name: 'LinkedIn', color: '#0077b5' },
+                'twitter': { icon: '🐦', name: 'Twitter', color: '#1DA1F2' },
+                'reddit': { icon: '🤖', name: 'Reddit', color: '#FF4500' }
+            };
+            
+            container.innerHTML = filtered.map((inf, index) => {
+                const platform = platformBadges[inf.platform] || { icon: '📱', name: 'Unknown', color: '#6c757d' };
+                const actualIndex = savedInfluencers.findIndex(i => i.authorUrl === inf.authorUrl);
+                
+                return `
+                    <div style="border: 1px solid ${platform.color}; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.8rem;">
+                            <div style="flex: 1;">
+                                <div style="margin-bottom: 0.5rem;">
+                                    <span class="badge" style="background: ${platform.color}; color: white;">
+                                        ${platform.icon} ${platform.name}
+                                    </span>
+                                </div>
+                                <strong style="color: #2E5C9A; font-size: 1.1rem;">
+                                    <a href="${inf.authorUrl}" target="_blank" style="color: #2E5C9A; text-decoration: none;">
+                                        ${inf.author}
+                                    </a>
+                                </strong>
+                                <div style="color: #6c757d; font-size: 0.85rem; margin-top: 0.3rem;">
+                                    Saved: ${new Date(inf.savedAt).toLocaleDateString()}
+                                </div>
+                            </div>
+                            <button onclick="deleteInfluencer(${actualIndex})" 
+                                    class="btn btn-secondary" 
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #E85D75;">
+                                🗑️
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 0.8rem;">
+                            <textarea id="influencerNotes${actualIndex}" 
+                                      placeholder="Add notes about this influencer..."
+                                      style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-height: 60px;"
+                                      onchange="updateInfluencerNotes(${actualIndex})">${inf.notes || ''}</textarea>
+                        </div>
+                        
+                        <div style="margin-top: 0.5rem;">
+                            <a href="${inf.authorUrl}" target="_blank" class="link-button" style="font-size: 0.85rem;">
+                                View Profile →
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Update influencer notes
+        function updateInfluencerNotes(index) {
+            const notes = document.getElementById(`influencerNotes${index}`).value;
+            savedInfluencers[index].notes = notes;
+            saveInfluencers();
+        }
+        
+        // Delete influencer
+        function deleteInfluencer(index) {
+            const inf = savedInfluencers[index];
+            if (confirm(`Remove ${inf.author} from influencers?`)) {
+                savedInfluencers.splice(index, 1);
+                saveInfluencers();
+                renderInfluencersList();
+                updateInfluencerCounts();
+            }
+        }
+        
+        // Update influencer counts
+        function updateInfluencerCounts() {
+            document.getElementById('countAll').textContent = savedInfluencers.length;
+            document.getElementById('countLinkedIn').textContent = savedInfluencers.filter(i => i.platform === 'linkedin').length;
+            document.getElementById('countTwitter').textContent = savedInfluencers.filter(i => i.platform === 'twitter').length;
+            document.getElementById('countReddit').textContent = savedInfluencers.filter(i => i.platform === 'reddit').length;
+        }
+        
+        // Export influencers
+        function exportInfluencers() {
+            if (savedInfluencers.length === 0) {
+                alert('No influencers to export!');
+                return;
+            }
+            
+            const headers = ['Platform', 'Author', 'Profile URL', 'Saved Date', 'Notes'];
+            const rows = savedInfluencers.map(inf => [
+                inf.platform,
+                inf.author,
+                inf.authorUrl,
+                new Date(inf.savedAt).toLocaleString(),
+                (inf.notes || '').replace(/"/g, '""')
+            ]);
+            
+            const csv = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `painmed-influencers-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`Exported ${savedInfluencers.length} influencers to CSV!`);
+        }
 
         // Initialize on load
         init();
 
         // Apply filters
         function applyFilters() {
+            const platform = document.getElementById('platformFilter').value;
             const selectedTopics = getSelectedTopics();
             const startDate = new Date(document.getElementById('startDate').value);
             const endDate = new Date(document.getElementById('endDate').value);
@@ -1437,10 +2033,11 @@ peer to peer appeals</textarea>
             filteredData = allData.filter(item => {
                 const itemDate = new Date(item.date);
                 
+                const platformMatch = platform === 'all' || item.platform === platform;
                 const topicMatch = selectedTopics.includes(item.topic);
                 const dateMatch = itemDate >= startDate && itemDate <= endDate;
                 
-                return topicMatch && dateMatch;
+                return platformMatch && topicMatch && dateMatch;
             });
 
             updateDashboard();
@@ -1448,6 +2045,8 @@ peer to peer appeals</textarea>
 
         // Reset filters
         function resetFilters() {
+            document.getElementById('platformFilter').value = 'all';
+            
             // Check all topics
             document.getElementById('selectAllTopics').checked = true;
             document.querySelectorAll('.topic-checkbox').forEach(cb => cb.checked = true);
@@ -1472,6 +2071,7 @@ peer to peer appeals</textarea>
             setTimeout(() => updatePayerChart(), 100);
             setTimeout(() => updateProcedureChart(), 200);
             setTimeout(() => generateAIInsights(), 300);
+            setTimeout(() => generateTrendingKeywords(), 350);
             setTimeout(() => generateLeadScoring(), 400);
             setTimeout(() => updatePostsTable(), 500);
         }
@@ -2322,6 +2922,206 @@ peer to peer appeals</textarea>
             
             return reasons;
         }
+        
+        // Generate Trending Keywords
+        function generateTrendingKeywords() {
+            const container = document.getElementById('trendingKeywords');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = '<p style="color: #95a5a6; text-align: center; padding: 2rem;">No data available for keyword analysis.</p>';
+                return;
+            }
+            
+            // Extract all words from content
+            const wordFrequency = {};
+            const stopWords = new Set([
+                'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'its', 'our', 'their', 'me', 'him', 'us', 'them', 'what', 'which', 'who', 'when', 'where', 'why', 'how', 'all', 'each', 'every', 'both', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'just', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'then', 'once'
+            ]);
+            
+            // Count word frequencies
+            filteredData.forEach(post => {
+                const words = post.content.toLowerCase()
+                    .replace(/[^\w\s]/g, ' ')
+                    .split(/\s+/)
+                    .filter(word => word.length > 3 && !stopWords.has(word));
+                
+                words.forEach(word => {
+                    wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+                });
+            });
+            
+            // Extract common phrases (2-3 words)
+            const phraseFrequency = {};
+            filteredData.forEach(post => {
+                const text = post.content.toLowerCase();
+                
+                // Common pain management phrases
+                const phrases = [
+                    'prior authorization', 'prior auth', 'pa denial', 'pa denied',
+                    'insurance denial', 'insurance rejected', 'claim denied', 'claim rejection',
+                    'peer to peer', 'peer review', 'appeal process', 'appeal denied',
+                    'billing issues', 'billing problems', 'billing denial', 'billing errors',
+                    'rcm solution', 'rcm software', 'rcm system', 'revenue cycle',
+                    'pain management', 'pain clinic', 'pain practice', 'pain procedures',
+                    'interventional pain', 'chronic pain', 'pain medicine', 'pain specialist',
+                    'spinal cord stimulator', 'epidural injection', 'nerve block', 'radiofrequency ablation',
+                    'medicare denial', 'medicaid denial', 'commercial insurance', 'insurance company',
+                    'medical necessity', 'documentation requirements', 'clinical documentation',
+                    'switching providers', 'looking for solution', 'need help', 'frustrated with',
+                    'time consuming', 'administrative burden', 'staff hours', 'workflow issues'
+                ];
+                
+                phrases.forEach(phrase => {
+                    if (text.includes(phrase)) {
+                        phraseFrequency[phrase] = (phraseFrequency[phrase] || 0) + 1;
+                    }
+                });
+            });
+            
+            // Get top keywords
+            const topWords = Object.entries(wordFrequency)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 20);
+            
+            // Get top phrases
+            const topPhrases = Object.entries(phraseFrequency)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 15);
+            
+            // Calculate trending score (frequency + recency)
+            const now = Date.now();
+            const trendingPhrases = topPhrases.map(([phrase, count]) => {
+                // Find posts with this phrase
+                const postsWithPhrase = filteredData.filter(p => 
+                    p.content.toLowerCase().includes(phrase)
+                );
+                
+                // Calculate average recency (days ago)
+                const avgRecency = postsWithPhrase.reduce((sum, p) => {
+                    const daysAgo = (now - new Date(p.date)) / (1000 * 60 * 60 * 24);
+                    return sum + daysAgo;
+                }, 0) / postsWithPhrase.length;
+                
+                // Trending score: higher frequency + more recent = higher score
+                const trendingScore = count * (1 / (avgRecency + 1));
+                
+                return { phrase, count, avgRecency, trendingScore };
+            }).sort((a, b) => b.trendingScore - a.trendingScore);
+            
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <!-- Trending Phrases -->
+                    <div>
+                        <h4 style="color: #2E5C9A; margin-bottom: 1rem; font-size: 1rem;">
+                            🔥 Hot Topics (Trending Now)
+                        </h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            ${trendingPhrases.slice(0, 10).map((item, index) => {
+                                const isHot = index < 3;
+                                const bgColor = isHot ? '#FFE5E5' : '#f8f9fa';
+                                const textColor = isHot ? '#E85D75' : '#2E5C9A';
+                                const icon = isHot ? '🔥' : '📈';
+                                
+                                return `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; background: ${bgColor}; border-radius: 6px; border-left: 3px solid ${textColor};">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span style="font-size: 1.2rem;">${icon}</span>
+                                            <span style="color: ${textColor}; font-weight: 600; text-transform: capitalize;">
+                                                ${item.phrase}
+                                            </span>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="color: ${textColor}; font-weight: 600; font-size: 1.1rem;">
+                                                ${item.count}
+                                            </div>
+                                            <div style="color: #6c757d; font-size: 0.75rem;">
+                                                mentions
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding: 0.8rem; background: #E0F2F1; border-radius: 6px; font-size: 0.85rem; color: #2E5C9A;">
+                            <strong>💡 Tip:</strong> Use these trending phrases as keywords in your next search to find more relevant discussions!
+                        </div>
+                    </div>
+                    
+                    <!-- Top Keywords -->
+                    <div>
+                        <h4 style="color: #2E5C9A; margin-bottom: 1rem; font-size: 1rem;">
+                            📊 Most Mentioned Keywords
+                        </h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            ${topWords.map(([word, count]) => {
+                                const size = Math.min(1.5, 0.8 + (count / topWords[0][1]) * 0.7);
+                                return `
+                                    <span style="
+                                        background: linear-gradient(135deg, #4DAFA7 0%, #2E5C9A 100%);
+                                        color: white;
+                                        padding: 0.4rem 0.8rem;
+                                        border-radius: 20px;
+                                        font-size: ${size}rem;
+                                        font-weight: 600;
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 0.3rem;
+                                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                    ">
+                                        ${word}
+                                        <span style="
+                                            background: rgba(255,255,255,0.3);
+                                            padding: 0.1rem 0.4rem;
+                                            border-radius: 10px;
+                                            font-size: 0.7rem;
+                                        ">
+                                            ${count}
+                                        </span>
+                                    </span>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4 style="color: #2E5C9A; margin-bottom: 0.8rem; font-size: 0.95rem;">
+                                📅 Trending Timeline
+                            </h4>
+                            ${trendingPhrases.slice(0, 5).map(item => `
+                                <div style="margin-bottom: 0.8rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                                        <span style="color: #2E5C9A; font-size: 0.85rem; font-weight: 600;">
+                                            ${item.phrase}
+                                        </span>
+                                        <span style="color: #6c757d; font-size: 0.8rem;">
+                                            ${Math.round(item.avgRecency)}d ago avg
+                                        </span>
+                                    </div>
+                                    <div style="background: #ecf0f1; height: 8px; border-radius: 4px; overflow: hidden;">
+                                        <div style="
+                                            background: linear-gradient(90deg, #4DAFA7 0%, #2E5C9A 100%);
+                                            height: 100%;
+                                            width: ${(item.count / trendingPhrases[0].count) * 100}%;
+                                            border-radius: 4px;
+                                        "></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #FFF9E6; border-radius: 6px; border-left: 4px solid #f39c12;">
+                    <strong style="color: #2E5C9A;">🎯 How to Use Trending Keywords:</strong>
+                    <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0; color: #6c757d; font-size: 0.9rem;">
+                        <li>Copy hot topics and use them as search keywords</li>
+                        <li>Create content addressing trending pain points</li>
+                        <li>Target ads using popular phrases</li>
+                        <li>Monitor keyword frequency changes over time</li>
+                    </ul>
+                </div>
+            `;
+        }
 
         // Open post URL
         function openPost(url, index) {
@@ -2357,7 +3157,7 @@ peer to peer appeals</textarea>
             const tbody = document.getElementById('postsTable');
             
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #7f8c8d;">No posts match the selected filters.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #7f8c8d;">No posts match the selected filters.</td></tr>';
                 return;
             }
 
@@ -2373,8 +3173,21 @@ peer to peer appeals</textarea>
                 const engagement = (item.likes || 0) + (item.comments || 0) + (item.shares || 0);
                 const bookmarked = isBookmarked(item.url);
                 
+                // Platform badge with color
+                const platformBadges = {
+                    'linkedin': { icon: '🔗', name: 'LinkedIn', color: '#0077b5' },
+                    'twitter': { icon: '🐦', name: 'Twitter', color: '#1DA1F2' },
+                    'reddit': { icon: '🤖', name: 'Reddit', color: '#FF4500' }
+                };
+                const platform = platformBadges[item.platform] || { icon: '📱', name: 'Unknown', color: '#6c757d' };
+                
                 return `
                     <tr>
+                        <td>
+                            <span class="badge" style="background: ${platform.color}; color: white;">
+                                ${platform.icon} ${platform.name}
+                            </span>
+                        </td>
                         <td>${date.toLocaleDateString()}</td>
                         <td>
                             <a href="${escapeHtml(item.authorUrl)}" target="_blank" class="link-button">
@@ -2392,16 +3205,23 @@ peer to peer appeals</textarea>
                         </td>
                         <td>
                             ${item.url && item.url !== '#' && item.url !== '' 
-                                ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="link-button">View Post →</a>`
-                                : `<span style="color: #95a5a6; font-size: 0.85rem;">No Link</span>`
+                                ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="link-button">View →</a>`
+                                : `<span style="color: #95a5a6; font-size: 0.85rem;">-</span>`
                             }
                         </td>
                         <td>
-                            <button onclick='toggleBookmark(${JSON.stringify(item).replace(/'/g, "\\'")}); event.stopPropagation();' 
-                                    style="background: ${bookmarked ? '#f39c12' : '#4DAFA7'}; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 1rem;"
-                                    title="${bookmarked ? 'Remove bookmark' : 'Save post'}">
-                                ${bookmarked ? '⭐' : '☆'}
-                            </button>
+                            <div style="display: flex; gap: 0.3rem;">
+                                <button onclick='toggleBookmark(${JSON.stringify(item).replace(/'/g, "\\'")}); event.stopPropagation();' 
+                                        style="background: ${bookmarked ? '#f39c12' : '#4DAFA7'}; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 1rem;"
+                                        title="${bookmarked ? 'Remove bookmark' : 'Save post'}">
+                                    ${bookmarked ? '⭐' : '☆'}
+                                </button>
+                                <button onclick='saveInfluencer("${escapeHtml(item.author).replace(/"/g, '&quot;')}", "${item.authorUrl}", "${item.platform}"); event.stopPropagation();' 
+                                        style="background: ${isInfluencerSaved(item.authorUrl) ? '#e74c3c' : '#ecf0f1'}; color: ${isInfluencerSaved(item.authorUrl) ? 'white' : '#2E5C9A'}; border: none; padding: 0.4rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 1rem;"
+                                        title="${isInfluencerSaved(item.authorUrl) ? 'Already saved' : 'Save as influencer'}">
+                                    👥
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -2448,6 +3268,451 @@ peer to peer appeals</textarea>
 
         // Initialize on load
         init();
+        
+        // ============================================
+        // MULTI-PLATFORM FETCH FUNCTIONS
+        // ============================================
+        
+        // Main multi-platform fetch function
+        async function fetchMultiPlatformData() {
+            const token = document.getElementById('apifyToken').value.trim();
+            const keywordsText = document.getElementById('searchKeywords').value.trim();
+            const maxItems = parseInt(document.getElementById('maxItems').value);
+            
+            const linkedinEnabled = document.getElementById('platformLinkedIn').checked;
+            const twitterEnabled = document.getElementById('platformTwitter').checked;
+            const redditEnabled = document.getElementById('platformReddit').checked;
+
+            console.log('=== Starting Multi-Platform Fetch ===');
+            console.log('Platforms enabled:', { linkedinEnabled, twitterEnabled, redditEnabled });
+            console.log('Max items per platform:', maxItems);
+            console.log('Token present:', !!token);
+
+            // Validation
+            if (!token) {
+                alert('Please enter your Apify API token');
+                return;
+            }
+            
+            if (!linkedinEnabled && !twitterEnabled && !redditEnabled) {
+                alert('Please select at least one platform');
+                return;
+            }
+            
+            if (linkedinEnabled) {
+                const cookie = document.getElementById('linkedinCookie').value.trim();
+                if (!cookie) {
+                    alert('LinkedIn cookie (li_at) is required when LinkedIn is selected');
+                    return;
+                }
+            }
+            
+            if (!keywordsText) {
+                alert('Please enter at least one keyword');
+                return;
+            }
+
+            // Parse keywords
+            const keywords = keywordsText.split('\n')
+                .map(k => k.trim())
+                .filter(k => k.length > 0);
+
+            if (keywords.length === 0) {
+                alert('Please enter at least one keyword');
+                return;
+            }
+
+            // Store keywords globally
+            searchKeywords = keywords;
+
+            // Show loading
+            document.getElementById('configPanel').style.display = 'none';
+            document.getElementById('loadingPanel').style.display = 'block';
+            updateLoadingStatus('Starting multi-platform data collection...');
+
+            try {
+                allData = [];
+                let platformResults = [];
+                
+                // Fetch from each enabled platform
+                if (linkedinEnabled) {
+                    updateLoadingStatus('� Fetching LinkedIn posts...');
+                    const linkedinData = await fetchLinkedInData(token, keywords, maxItems);
+                    platformResults.push({ platform: 'LinkedIn', count: linkedinData.length });
+                    allData = allData.concat(linkedinData);
+                }
+                
+                if (twitterEnabled) {
+                    updateLoadingStatus('🐦 Fetching Twitter/X posts...');
+                    const twitterData = await fetchTwitterData(token, keywords, maxItems);
+                    platformResults.push({ platform: 'Twitter', count: twitterData.length });
+                    allData = allData.concat(twitterData);
+                }
+                
+                if (redditEnabled) {
+                    updateLoadingStatus('🤖 Fetching Reddit discussions...');
+                    const redditData = await fetchRedditData(token, keywords, maxItems);
+                    platformResults.push({ platform: 'Reddit', count: redditData.length });
+                    allData = allData.concat(redditData);
+                }
+
+                if (allData.length === 0) {
+                    throw new Error('No data found. Try different keywords or check your settings.');
+                }
+
+                console.log('✓ Total items fetched:', allData.length);
+                platformResults.forEach(r => console.log(`  ${r.platform}: ${r.count} items`));
+                
+                // Save to cache
+                saveToCache(allData, keywords);
+                
+                // Show dashboard
+                document.getElementById('loadingPanel').style.display = 'none';
+                document.getElementById('filtersPanel').style.display = 'block';
+                
+                populateTopicFilter();
+                applyFilters();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`Failed to fetch data: ${error.message}`);
+                document.getElementById('loadingPanel').style.display = 'none';
+                document.getElementById('configPanel').style.display = 'block';
+            }
+        }
+        
+        // Fetch Twitter data
+        async function fetchTwitterData(token, keywords, maxItems) {
+            const verifiedOnly = document.getElementById('twitterVerifiedOnly').checked;
+            const excludeRetweets = document.getElementById('twitterExcludeRetweets').checked;
+            const minLikes = parseInt(document.getElementById('twitterMinLikes').value) || 0;
+            
+            const allResults = [];
+            
+            for (const keyword of keywords) {
+                try {
+                    console.log(`🐦 Fetching Twitter data for: "${keyword}"`);
+                    
+                    // Call Netlify Function instead of direct API
+                    const url = `/.netlify/functions/fetch-twitter`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            token: token,
+                            keyword: keyword,
+                            maxItems: Math.ceil(maxItems / keywords.length),
+                            verifiedOnly: verifiedOnly,
+                            excludeRetweets: excludeRetweets,
+                            minLikes: minLikes
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('   Twitter API Error Response:', errorData);
+                        throw new Error(`Twitter API Error: ${response.status} - ${errorData.error}`);
+                    }
+
+                    const rawData = await response.json();
+                    console.log(`   Retrieved ${rawData.length} tweets`);
+                    
+                    if (rawData.length > 0) {
+                        console.log('   Sample tweet:', rawData[0]);
+                    }
+                    
+                    // Normalize data
+                    const normalized = rawData.map(item => ({
+                        date: item.createdAt || new Date().toISOString(),
+                        author: item.author?.name || item.author?.userName || 'Unknown',
+                        authorUrl: item.author?.url || item.author?.twitterUrl || '#',
+                        content: item.text || '',
+                        platform: 'twitter',
+                        likes: item.likeCount || 0,
+                        comments: item.replyCount || 0,
+                        shares: item.retweetCount || 0,
+                        url: item.url || item.twitterUrl || '#',
+                        topic: keyword
+                    }));
+                    
+                    allResults.push(...normalized);
+                    console.log(`   ✓ Added ${normalized.length} tweets to results`);
+                } catch (error) {
+                    console.error(`   ✗ Error fetching Twitter data for "${keyword}":`, error);
+                }
+            }
+            
+            return allResults;
+        }
+        
+        // Fetch Reddit data
+        async function fetchRedditData(token, keywords, maxItems) {
+            const sort = document.getElementById('redditSort').value;
+            const time = document.getElementById('redditTime').value;
+            const subreddits = document.getElementById('redditSubreddits').value.trim();
+            
+            const allResults = [];
+            
+            for (const keyword of keywords) {
+                try {
+                    console.log(`🤖 Fetching Reddit data for: "${keyword}"`);
+                    
+                    // Call Netlify Function instead of direct API
+                    const url = `/.netlify/functions/fetch-reddit`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            token: token,
+                            keyword: keyword,
+                            maxItems: Math.ceil(maxItems / keywords.length),
+                            sort: sort,
+                            time: time,
+                            subreddits: subreddits
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('   Reddit API Error Response:', errorData);
+                        throw new Error(`Reddit API Error: ${response.status} - ${errorData.error}`);
+                    }
+
+                    const rawData = await response.json();
+                    console.log(`   Retrieved ${rawData.length} posts`);
+                    
+                    if (rawData.length > 0) {
+                        console.log('   Sample post:', rawData[0]);
+                    }
+                    
+                    // Normalize data
+                    const normalized = rawData.map(item => ({
+                        date: item.createdAt || new Date().toISOString(),
+                        author: item.authorName || 'Unknown',
+                        authorUrl: `https://reddit.com/user/${item.authorName}`,
+                        content: item.title + (item.body ? '\n\n' + item.body : ''),
+                        platform: 'reddit',
+                        likes: item.upVotes || 0,
+                        comments: item.commentsCount || 0,
+                        shares: 0,
+                        url: item.postUrl || item.url || '#',
+                        topic: keyword,
+                        subreddit: item.subredditName || item.communityName
+                    }));
+                    
+                    allResults.push(...normalized);
+                    console.log(`   ✓ Added ${normalized.length} posts to results`);
+                } catch (error) {
+                    console.error(`   ✗ Error fetching Reddit data for "${keyword}":`, error);
+                }
+            }
+            
+            return allResults;
+        }
+        
+        // Fetch LinkedIn data
+        async function fetchLinkedInData(token, keywords, maxItems) {
+            const cookie = document.getElementById('linkedinCookie').value.trim();
+            const searchType = document.getElementById('linkedinSearchType').value;
+            
+            const allResults = [];
+            
+            for (const keyword of keywords) {
+                try {
+                    const encodedKeyword = encodeURIComponent(keyword.trim());
+                    const searchUrl = `https://www.linkedin.com/search/results/${searchType}/?keywords=${encodedKeyword}&origin=GLOBAL_SEARCH_HEADER`;
+                    
+                    const input = {
+                        cookie: getCookieArray(cookie),
+                        userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+                        urls: [searchUrl],
+                        limitPerSource: Math.ceil(maxItems / keywords.length),
+                        deepScrape: false,
+                        rawData: false,
+                        minDelay: 2,
+                        maxDelay: 8,
+                        proxy: {
+                            useApifyProxy: true,
+                            apifyProxyCountry: "US"
+                        }
+                    };
+                    
+                    const url = `${APIFY_CONFIG.apiBaseUrl}/acts/${APIFY_CONFIG.linkedin.actorId}/runs?token=${token}`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(input)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`LinkedIn API Error: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const runId = result.data.id;
+                    
+                    // Wait for completion
+                    await waitForRunCompletion(token, runId);
+                    
+                    // Get results
+                    const datasetId = result.data.defaultDatasetId;
+                    const rawData = await fetchDataset(token, datasetId);
+                    
+                    // Normalize data
+                    const normalized = rawData.map(item => {
+                        const author = item.authorName || 'Unknown';
+                        const authorUrl = item.authorProfileUrl || '#';
+                        let postUrl = item.url || item.postUrl || '#';
+                        
+                        // Fix incomplete LinkedIn URLs
+                        if (postUrl && postUrl.includes('activity-') && !postUrl.match(/activity-\d+-\w{4}/)) {
+                            const activityMatch = postUrl.match(/activity-(\d+)/);
+                            if (activityMatch) {
+                                postUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${activityMatch[1]}/`;
+                            }
+                        }
+                        
+                        return {
+                            date: item.postedAtISO || item.postedAt || new Date().toISOString(),
+                            author: author,
+                            authorUrl: authorUrl,
+                            content: item.text || item.content || '',
+                            platform: 'linkedin',
+                            likes: item.numLikes || 0,
+                            comments: item.numComments || 0,
+                            shares: item.numShares || 0,
+                            url: postUrl,
+                            topic: keyword
+                        };
+                    });
+                    
+                    allResults.push(...normalized);
+                } catch (error) {
+                    console.error(`Error fetching LinkedIn data for "${keyword}":`, error);
+                }
+            }
+            
+            return allResults;
+        }
+        
+        // Get cookie array for LinkedIn
+        function getCookieArray(liAtValue) {
+            return [
+                {"domain": ".linkedin.com", "name": "lms_ads", "value": "AQFqpJug0ZkFJAAAAZwCHbmxN6xfF2RUbZhbkydXmHuX-lh8Ub4bNAFveAxMmm9TG8yW9IpGVUHzAT5N86PM5xIde2Dlh1KI", "path": "/", "secure": true, "httpOnly": false},
+                {"domain": ".linkedin.com", "name": "_guid", "value": "129ae7f6-79a8-45fd-a31d-0486f2decc26", "path": "/", "secure": true, "httpOnly": false},
+                {"domain": ".linkedin.com", "name": "bcookie", "value": "\"v=2&e54d18a5-c177-497e-8ab9-6c60bf330702\"", "path": "/", "secure": true, "httpOnly": false},
+                {"domain": ".linkedin.com", "name": "lms_analytics", "value": "AQFqpJug0ZkFJAAAAZwCHbmxN6xfF2RUbZhbkydXmHuX-lh8Ub4bNAFveAxMmm9TG8yW9IpGVUHzAT5N86PM5xIde2Dlh1KI", "path": "/", "secure": true, "httpOnly": false},
+                {"domain": ".www.linkedin.com", "name": "li_at", "value": liAtValue, "path": "/", "secure": true, "httpOnly": true},
+                {"domain": ".linkedin.com", "name": "lang", "value": "v=2&lang=en-us", "path": "/", "secure": true, "httpOnly": false},
+                {"domain": ".linkedin.com", "name": "lidc", "value": "\"b=OGST02:s=O:r=O:a=O:p=O:g=3724:u=1:x=1:i=1769562379:t=1769647549:v=2:sig=AQG0RRDY5TqhoUjOQT_-IuY4Q37uRTjd\"", "path": "/", "secure": true, "httpOnly": false},
+                {"domain": ".www.linkedin.com", "name": "bscookie", "value": "\"v=1&2026012801002105821962-8aa8-4867-8cc3-c2db0d4482dbAQGydB9VRRntWEP6EFWY9JA5yTx8duMh\"", "path": "/", "secure": true, "httpOnly": true},
+                {"domain": ".www.linkedin.com", "name": "JSESSIONID", "value": "\"ajax:7160386635290813687\"", "path": "/", "secure": true, "httpOnly": false},
+                {"domain": ".linkedin.com", "name": "li_sugr", "value": "cfbc4abf-f93d-4968-9024-c38b5c2e32d6", "path": "/", "secure": true, "httpOnly": false}
+            ];
+        }
+        
+        // ============================================
+        // DEMO DATA FUNCTION
+        // ============================================
+        
+        function loadDemoData() {
+            // Show loading
+            document.getElementById('configPanel').style.display = 'none';
+            document.getElementById('loadingPanel').style.display = 'block';
+            updateLoadingStatus('Loading demo data...');
+            
+            setTimeout(() => {
+                // Generate demo data for all platforms
+                const demoKeywords = ['prior authorization pain management', 'interventional pain billing', 'spinal cord stimulator denials'];
+                searchKeywords = demoKeywords;
+                
+                allData = generateDemoData(demoKeywords);
+                
+                console.log('✓ Demo data loaded:', allData.length, 'items');
+                
+                // Show dashboard
+                document.getElementById('loadingPanel').style.display = 'none';
+                document.getElementById('filtersPanel').style.display = 'block';
+                
+                populateTopicFilter();
+                applyFilters();
+            }, 1000);
+        }
+        
+        function generateDemoData(keywords) {
+            const data = [];
+            const now = new Date();
+            
+            // LinkedIn demo data
+            for (let i = 0; i < 17; i++) {
+                const keyword = keywords[i % keywords.length];
+                const daysAgo = Math.floor(Math.random() * 30);
+                const date = new Date(now);
+                date.setDate(date.getDate() - daysAgo);
+                
+                data.push({
+                    date: date.toISOString(),
+                    author: `Healthcare Professional ${i + 1}`,
+                    authorUrl: `https://linkedin.com/in/user${i}`,
+                    content: `Discussing ${keyword} challenges in our practice. The current process is frustrating and time-consuming for both staff and patients.`,
+                    platform: 'linkedin',
+                    likes: Math.floor(Math.random() * 50) + 10,
+                    comments: Math.floor(Math.random() * 20) + 5,
+                    shares: Math.floor(Math.random() * 10),
+                    url: `https://linkedin.com/posts/activity-${1000000 + i}`,
+                    topic: keyword
+                });
+            }
+            
+            // Twitter demo data
+            for (let i = 0; i < 17; i++) {
+                const keyword = keywords[i % keywords.length];
+                const daysAgo = Math.floor(Math.random() * 14);
+                const date = new Date(now);
+                date.setDate(date.getDate() - daysAgo);
+                
+                data.push({
+                    date: date.toISOString(),
+                    author: `@HealthcareUser${i + 1}`,
+                    authorUrl: `https://twitter.com/HealthcareUser${i + 1}`,
+                    content: `Just spent 3 hours on ${keyword}. There has to be a better way! #healthcare #priorauth #frustrated`,
+                    platform: 'twitter',
+                    likes: Math.floor(Math.random() * 100) + 20,
+                    comments: Math.floor(Math.random() * 30) + 5,
+                    shares: Math.floor(Math.random() * 15),
+                    url: `https://twitter.com/i/status/1${700000000 + i}`,
+                    topic: keyword
+                });
+            }
+            
+            // Reddit demo data
+            for (let i = 0; i < 16; i++) {
+                const keyword = keywords[i % keywords.length];
+                const daysAgo = Math.floor(Math.random() * 21);
+                const date = new Date(now);
+                date.setDate(date.getDate() - daysAgo);
+                const subreddits = ['medicine', 'healthcare', 'medicalbilling', 'ChronicPain'];
+                
+                data.push({
+                    date: date.toISOString(),
+                    author: `reddit_user_${i + 1}`,
+                    authorUrl: `https://reddit.com/user/reddit_user_${i + 1}`,
+                    content: `Question about ${keyword}: Has anyone found a solution to streamline this process? Our clinic is drowning in paperwork.`,
+                    platform: 'reddit',
+                    likes: Math.floor(Math.random() * 200) + 50,
+                    comments: Math.floor(Math.random() * 40) + 10,
+                    shares: 0,
+                    url: `https://reddit.com/r/${subreddits[i % subreddits.length]}/comments/abc${i}`,
+                    topic: keyword,
+                    subreddit: subreddits[i % subreddits.length]
+                });
+            }
+            
+            return data;
+        }
     </script>
 </body>
 </html>

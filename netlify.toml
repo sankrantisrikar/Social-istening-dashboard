@@ -1,6 +1,7 @@
 [build]
   publish = "."
   command = "echo 'No build required - static site'"
+  functions = ".netlify/functions"
 
 [[redirects]]
   from = "/"
