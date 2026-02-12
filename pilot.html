@@ -3340,8 +3340,8 @@ peer to peer appeals</textarea>
         
         // Fetch Reddit data using Reddit's public JSON API
         async function fetchRedditData(keywords, maxItems) {
-            const sort = document.getElementById('redditSort').value;
-            const time = document.getElementById('redditTime').value;
+            const sort = document.getElementById('redditSort').value || 'relevance';
+            const time = document.getElementById('redditTime').value || 'all';
             const subreddits = document.getElementById('redditSubreddits').value.trim();
             
             const allResults = [];
@@ -3349,71 +3349,111 @@ peer to peer appeals</textarea>
             for (const keyword of keywords) {
                 try {
                     console.log(`🤖 Fetching Reddit data for: "${keyword}"`);
+                    console.log(`   Settings: sort=${sort}, time=${time}, subreddits=${subreddits || 'all'}`);
                     
                     // Build Reddit search URL
                     let searchUrl = 'https://www.reddit.com/search.json';
                     const params = new URLSearchParams({
                         q: keyword,
-                        limit: Math.ceil(maxItems / keywords.length),
+                        limit: Math.min(100, Math.ceil(maxItems / keywords.length)), // Reddit max is 100
                         sort: sort,
                         t: time,
-                        type: 'link'
+                        raw_json: 1 // Get raw JSON without HTML entities
                     });
                     
                     // Add subreddit filter if specified
                     if (subreddits) {
-                        const subredditList = subreddits.split(',').map(s => s.trim())[0];
-                        searchUrl = `https://www.reddit.com/r/${subredditList}/search.json`;
-                        params.set('restrict_sr', 'true');
+                        const subredditList = subreddits.split(',').map(s => s.trim()).filter(s => s);
+                        if (subredditList.length > 0) {
+                            // Search within specific subreddit
+                            searchUrl = `https://www.reddit.com/r/${subredditList[0]}/search.json`;
+                            params.set('restrict_sr', 'true');
+                        }
                     }
                     
                     const url = `${searchUrl}?${params.toString()}`;
                     console.log(`   Fetching from: ${url}`);
                     
                     const response = await fetch(url, {
+                        method: 'GET',
                         headers: {
-                            'User-Agent': 'Mozilla/5.0 (compatible; PainMed-Dashboard/1.0)'
+                            'Accept': 'application/json'
                         }
                     });
 
                     if (!response.ok) {
-                        console.error(`   Reddit API Error: ${response.status}`);
+                        const errorText = await response.text();
+                        console.error(`   Reddit API Error: ${response.status}`, errorText);
+                        
+                        // If we get an error, try a simpler search
+                        if (response.status === 429) {
+                            console.warn('   Rate limited, waiting 2 seconds...');
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            continue;
+                        }
                         throw new Error(`Reddit API Error: ${response.status}`);
                     }
 
                     const data = await response.json();
-                    const posts = data.data.children || [];
-                    console.log(`   Retrieved ${posts.length} posts`);
-                    
-                    if (posts.length > 0) {
-                        console.log('   Sample post:', posts[0].data);
-                    }
-                    
-                    // Normalize data
-                    const normalized = posts.map(item => {
-                        const post = item.data;
-                        return {
-                            date: new Date(post.created_utc * 1000).toISOString(),
-                            author: post.author || 'Unknown',
-                            authorUrl: `https://reddit.com/user/${post.author}`,
-                            content: post.title + (post.selftext ? '\n\n' + post.selftext : ''),
-                            platform: 'reddit',
-                            likes: post.ups || 0,
-                            comments: post.num_comments || 0,
-                            shares: 0,
-                            url: `https://reddit.com${post.permalink}`,
-                            topic: keyword,
-                            subreddit: post.subreddit
-                        };
+                    console.log('   Reddit API response structure:', {
+                        hasData: !!data.data,
+                        hasChildren: !!(data.data && data.data.children),
+                        childrenCount: data.data && data.data.children ? data.data.children.length : 0
                     });
                     
+                    if (!data.data || !data.data.children) {
+                        console.warn('   No data.children found in response');
+                        continue;
+                    }
+                    
+                    const posts = data.data.children || [];
+                    console.log(`   Retrieved ${posts.length} posts from Reddit`);
+                    
+                    if (posts.length > 0) {
+                        console.log('   Sample post title:', posts[0].data.title);
+                        console.log('   Sample post subreddit:', posts[0].data.subreddit);
+                    }
+                    
+                    // Normalize data - filter out removed/deleted posts
+                    const normalized = posts
+                        .filter(item => {
+                            const post = item.data;
+                            return post && 
+                                   post.title && 
+                                   post.author !== '[deleted]' && 
+                                   !post.removed_by_category;
+                        })
+                        .map(item => {
+                            const post = item.data;
+                            return {
+                                date: new Date(post.created_utc * 1000).toISOString(),
+                                author: post.author || 'Unknown',
+                                authorUrl: `https://reddit.com/user/${post.author}`,
+                                content: post.title + (post.selftext ? '\n\n' + post.selftext : ''),
+                                platform: 'reddit',
+                                likes: post.ups || 0,
+                                comments: post.num_comments || 0,
+                                shares: 0,
+                                url: post.url && post.url.includes('reddit.com') ? post.url : `https://reddit.com${post.permalink}`,
+                                topic: keyword,
+                                subreddit: post.subreddit
+                            };
+                        });
+                    
                     allResults.push(...normalized);
-                    console.log(`   ✓ Added ${normalized.length} posts to results`);
+                    console.log(`   ✓ Added ${normalized.length} valid posts to results`);
+                    
+                    // Small delay to avoid rate limiting
+                    if (keywords.indexOf(keyword) < keywords.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
                 } catch (error) {
                     console.error(`   ✗ Error fetching Reddit data for "${keyword}":`, error);
+                    console.error('   Error details:', error.message);
                 }
             }
             
+            console.log(`🤖 Total Reddit results: ${allResults.length}`);
             return allResults;
         }
         
