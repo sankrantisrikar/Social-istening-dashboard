@@ -1,100 +1,92 @@
-exports.handler = async (event, context) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
+const fetch = require('node-fetch');
 
-  try {
-    const { token, keyword, maxItems, sort, time, subreddits } = JSON.parse(event.body);
-
-    const input = {
-      searchTerms: [keyword],
-      searchPosts: true,
-      searchComments: false,
-      searchSort: sort,
-      searchTime: time,
-      maxPostsCount: maxItems,
-      fastMode: true,
-      proxy: {
-        useApifyProxy: true,
-        apifyProxyGroups: ['RESIDENTIAL']
-      }
+exports.handler = async function(event, context) {
+    // Set CORS headers
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Content-Type': 'application/json'
     };
 
-    // Add subreddit filter if specified
-    if (subreddits) {
-      const subredditList = subreddits.split(',').map(s => s.trim());
-      if (subredditList.length > 0) {
-        input.withinCommunity = `r/${subredditList[0]}`;
-      }
+    // Handle preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
     }
 
-    const url = `https://api.apify.com/v2/acts/harshmaur/reddit-scraper-pro/runs?token=${token}`;
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return {
-        statusCode: response.status,
-        body: JSON.stringify({ error: `Reddit API Error: ${response.status}`, details: errorText })
-      };
+    // Only allow POST
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
 
-    const result = await response.json();
-    const runId = result.data.id;
+    try {
+        const { keyword, maxItems, sort, time, subreddits } = JSON.parse(event.body);
 
-    // Wait for completion (with timeout)
-    const maxWaitTime = 300000; // 5 minutes
-    const startTime = Date.now();
+        // Build Reddit search URL
+        let searchUrl = 'https://www.reddit.com/search.json';
+        const params = new URLSearchParams({
+            q: keyword,
+            limit: Math.min(100, maxItems || 25),
+            sort: sort || 'relevance',
+            t: time || 'all',
+            raw_json: 1,
+            type: 'link'
+        });
 
-    while (Date.now() - startTime < maxWaitTime) {
-      const statusUrl = `https://api.apify.com/v2/actor-runs/${runId}?token=${token}`;
-      const statusResponse = await fetch(statusUrl);
-      const statusData = await statusResponse.json();
+        // Add subreddit filter if specified
+        if (subreddits) {
+            const subredditList = subreddits.split(',').map(s => s.trim()).filter(s => s);
+            if (subredditList.length > 0) {
+                searchUrl = `https://www.reddit.com/r/${subredditList[0]}/search.json`;
+                params.set('restrict_sr', 'true');
+            }
+        }
 
-      if (statusData.data.status === 'SUCCEEDED') {
-        // Get results
-        const datasetId = statusData.data.defaultDatasetId;
-        const dataUrl = `https://api.apify.com/v2/datasets/${datasetId}/items?token=${token}&format=json`;
-        const dataResponse = await fetch(dataUrl);
-        const rawData = await dataResponse.json();
+        const url = `${searchUrl}?${params.toString()}`;
+        
+        console.log('Fetching from Reddit:', url);
+
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Reddit API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // Extract posts
+        const posts = data.data?.children || [];
+        
+        // Filter and return
+        const results = posts
+            .filter(item => {
+                const post = item.data;
+                return post && post.title && post.author !== '[deleted]';
+            })
+            .map(item => item.data);
 
         return {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-          body: JSON.stringify(rawData)
+            statusCode: 200,
+            headers,
+            body: JSON.stringify(results)
         };
-      } else if (statusData.data.status === 'FAILED' || statusData.data.status === 'ABORTED') {
+
+    } catch (error) {
+        console.error('Reddit fetch error:', error);
         return {
-          statusCode: 500,
-          body: JSON.stringify({ error: `Run ${statusData.data.status}` })
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ 
+                error: error.message || 'Failed to fetch Reddit data'
+            })
         };
-      }
-
-      // Wait 2 seconds before checking again
-      await new Promise(resolve => setTimeout(resolve, 2000));
     }
-
-    return {
-      statusCode: 408,
-      body: JSON.stringify({ error: 'Timeout waiting for results' })
-    };
-
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
-  }
 };
