@@ -337,8 +337,8 @@
             
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label>Apify API Token *</label>
-                    <input type="password" id="apifyToken" placeholder="apify_api_xxxxxxxxxxxxx" value="" />
+                    <label>Apify API Token (Required for LinkedIn only)</label>
+                    <input type="password" id="apifyToken" placeholder="apify_api_xxxxxxxxxxxxx (not needed for Reddit-only)" value="" />
                 </div>
                 
                 <div class="filter-group">
@@ -3253,17 +3253,17 @@ peer to peer appeals</textarea>
             console.log('Token present:', !!token);
 
             // Validation
-            if (!token) {
-                alert('Please enter your Apify API token');
-                return;
-            }
-            
             if (!linkedinEnabled && !redditEnabled) {
                 alert('Please select at least one platform');
                 return;
             }
             
+            // Only require Apify token if LinkedIn is selected
             if (linkedinEnabled) {
+                if (!token) {
+                    alert('Please enter your Apify API token (required for LinkedIn)');
+                    return;
+                }
                 const cookie = document.getElementById('linkedinCookie').value.trim();
                 if (!cookie) {
                     alert('LinkedIn cookie (li_at) is required when LinkedIn is selected');
